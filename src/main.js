@@ -2,13 +2,12 @@
 
 const ROUTE_POINT_COUNT = 3;
 
-const siteHeaderElement = document.querySelector('.page-header');
-const headerMain = siteHeaderElement.querySelector('.trip-main');
-const headerControls = siteHeaderElement.querySelector('.trip-controls');
-const headerControlsFirstTitle = siteHeaderElement.querySelector('h2');
-const siteMainElement = document.querySelector('.page-main');
-const tripEvents = siteMainElement.querySelector('.trip-events');
-const yellowButton = siteHeaderElement.querySelector('.trip-main__event-add-btn');
+const siteHeaderElement = document.querySelector(`.page-header`);
+const headerMain = siteHeaderElement.querySelector(`.trip-main`);
+const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
+const headerControlsFirstTitle = siteHeaderElement.querySelector(`h2`);
+const siteMainElement = document.querySelector(`.page-main`);
+const tripEvents = siteMainElement.querySelector(`.trip-events`);
 
 const createHeaderInfo = () => {
   return (
@@ -52,15 +51,7 @@ const createHeaderFilter = () => {
   );
 };
 
-const createInfoMessage = () => {
-  return (
-    `<p class="trip-events__msg">Click New Event to create your first point</p>`
-  );
-}
-
 const createEventForm = () => {
-  yellowButton.setAttribute('disabled', 'disabled');
-
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
@@ -173,7 +164,6 @@ const createEventForm = () => {
 };
 
 const createSort = () => {
-  mainInfoMessage.style.display = 'none';
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <span class="trip-sort__item  trip-sort__item--day">Day</span>
@@ -284,13 +274,16 @@ const createTripDays = () => {
   return (
     `<ul class="trip-days">
   </ul>`
-  )
+  );
 };
 
 const createDaysItem = () => {
   return (
     `<li class="trip-days__item  day">
-      <div class="day__info"></div>
+      <div class="day__info">
+      <span class="day__counter">1</span>
+      <time class="day__date" datetime="2019-03-18">MAR 18</time>
+      </div>
       <ul class="trip-events__list">
       </ul>
     </li>`
@@ -337,7 +330,6 @@ const createRoutePoint = () => {
 };
 
 const createTotalPrice = () => {
-  tripInfoCost.querySelector('span').remove();
   return (
     `<span class="trip-info__cost-value">1230</span>`
   );
@@ -357,36 +349,33 @@ const render = function (container, template, place) {
   container.insertAdjacentHTML(place, template);
 };
 
-render(headerMain, createHeaderInfo(), 'afterbegin');
-render(headerControlsFirstTitle, createHeaderMenu(), 'afterend');
-render(headerControls, createHeaderFilter(), 'beforeend');
-render(tripEvents, createInfoMessage(), 'beforeend');
+render(headerMain, createHeaderInfo(), `afterbegin`);
+render(headerControlsFirstTitle, createHeaderMenu(), `afterend`);
+render(headerControls, createHeaderFilter(), `beforeend`);
 
-const mainInfoMessage = tripEvents.querySelector('.trip-events__msg');
+render(tripEvents, createSort(), `beforeend`);
+render(tripEvents, createEventForm(), `beforeend`);
 
-render(tripEvents, createSort(), 'beforeend');
-render(tripEvents,createEventForm(), 'beforeend');
+const tripItem = tripEvents.querySelector(`.trip-events__item`);
 
-const tripItem = tripEvents.querySelector('.trip-events__item');
+render(tripItem, createEventDetalis(), `beforeend`);
 
-render(tripItem,createEventDetalis(), 'beforeend');
+const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
 
-const tripHeaderInfo = headerMain.querySelector('.trip-main__trip-info');
+render(tripHeaderInfo, createTripInfo(), `afterbegin`);
+render(tripEvents, createTripDays(), `beforeend`);
 
-render(tripHeaderInfo, createTripInfo(), 'afterbegin');
-render(tripEvents, createTripDays(), 'beforeend');
+const tripDays = tripEvents.querySelector(`.trip-days`);
 
-const tripDays = tripEvents.querySelector('.trip-days');
+render(tripDays, createDaysItem(), `beforeend`);
 
-render(tripDays, createDaysItem(), 'beforeend');
+const eventsList = tripEvents.querySelector(`.trip-events__list`);
 
-const eventsList = tripEvents.querySelector('.trip-events__list');
-
-for(let i = 0; i < ROUTE_POINT_COUNT; i++) {
-  render(eventsList, createRoutePoint(), 'beforeend');
-};
+for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
+  render(eventsList, createRoutePoint(), `beforeend`);
+}
 
 
-const tripInfoCost = headerMain.querySelector('.trip-info__cost');
+const tripInfoCost = headerMain.querySelector(`.trip-info__cost`);
 
-render(tripInfoCost, createTotalPrice(), 'beforeend');
+render(tripInfoCost, createTotalPrice(), `beforeend`);
