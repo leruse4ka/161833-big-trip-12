@@ -1,55 +1,62 @@
 import {createHeaderInfo} from "./view/header-info.js";
 import {createHeaderMenu} from "./view/header-menu.js";
 import {createHeaderFilter} from "./view/header-filter.js";
-import {createEventForm} from "./view/event-form.js";
+import {createTripEdit} from "./view/trip-edit.js";
 import {createSort} from "./view/sort.js";
 import {createEventDetalis} from "./view/event-detalis.js";
 import {createTripDays} from "./view/trip-days.js";
 import {createDaysItem} from "./view/days-item.js";
-import {createRoutePoint} from "./view/route-point.js";
-import {createTotalPrice} from "./view/total-price.js";
+import {createWaypointTemplate} from "./view/waypoint.js";
 import {createTripInfo} from "./view/trip-info.js";
+import {waypoints} from "./mock/mock.js";
+import {createElement, renderElement} from "./util.js";
+import {generateFilter} from "./mock/filter.js";
+import {generateSort} from "./mock/sort.js";
 
-const ROUTE_POINT_COUNT = 3;
+const dates = [
+  ...new Set(waypoints.map((item) => new Date(item.startDate).toDateString()))
+];
+
+const filters = generateFilter(waypoints);
+const sorts = generateSort(waypoints);
 
 const siteHeaderElement = document.querySelector(`.page-header`);
 const headerMain = siteHeaderElement.querySelector(`.trip-main`);
 const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
-const headerControlsFirstTitle = siteHeaderElement.querySelector(`h2`);
 const siteMainElement = document.querySelector(`.page-main`);
 const tripEvents = siteMainElement.querySelector(`.trip-events`);
 
-const render = function (container, template, place) {
-  container.insertAdjacentHTML(place, template);
-};
+renderElement(headerMain, createElement(createHeaderInfo()), `afterbegin`);
+renderElement(headerControls, createElement(createHeaderMenu()), `afterbegin`);
+renderElement(headerControls, createElement(createHeaderFilter(filters)), `beforeend`);
 
-render(headerMain, createHeaderInfo(), `afterbegin`);
-render(headerControlsFirstTitle, createHeaderMenu(), `afterend`);
-render(headerControls, createHeaderFilter(), `beforeend`);
-
-render(tripEvents, createSort(), `beforeend`);
-render(tripEvents, createEventForm(), `beforeend`);
+renderElement(tripEvents, createElement(createSort(sorts)), `beforeend`);
+renderElement(tripEvents, createElement(createTripEdit(waypoints[0])), `beforeend`);
 
 const tripItem = tripEvents.querySelector(`.trip-events__item`);
 
-render(tripItem, createEventDetalis(), `beforeend`);
+renderElement(tripItem, createElement(createEventDetalis(waypoints[0])), `beforeend`);
 
 const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
 
-render(tripHeaderInfo, createTripInfo(), `afterbegin`);
-render(tripEvents, createTripDays(), `beforeend`);
+renderElement(tripHeaderInfo, createElement(createTripInfo(waypoints)), `afterbegin`);
+renderElement(tripEvents, createElement(createTripDays()), `beforeend`);
 
 const tripDays = tripEvents.querySelector(`.trip-days`);
 
-render(tripDays, createDaysItem(), `beforeend`);
 
-const eventsList = tripEvents.querySelector(`.trip-events__list`);
+dates.forEach((date, dateIndex) => {
+  const day = createElement(createDaysItem(new Date(date), dateIndex + 1));
 
-for (let i = 0; i < ROUTE_POINT_COUNT; i++) {
-  render(eventsList, createRoutePoint(), `beforeend`);
-}
+  waypoints
+    .filter((waypoint) => new Date(waypoint.startDate).toDateString() === date)
+    .forEach((waypoint) => {
+      renderElement(day.querySelector(`.trip-events__list`), createElement(createWaypointTemplate(waypoint)), `beforeend`);
+    });
+  renderElement(tripDays, day, `beforeend`);
+});
 
+const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
 
-const tripInfoCost = headerMain.querySelector(`.trip-info__cost`);
+document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
 
-render(tripInfoCost, createTotalPrice(), `beforeend`);
