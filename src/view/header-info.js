@@ -1,4 +1,6 @@
-export const createHeaderInfo = () => {
+import {createElement} from "../util.js";
+
+const createHeaderInfo = () => {
   return (
     `<section class="trip-main__trip-info  trip-info">
     <p class="trip-info__cost">
@@ -7,3 +9,25 @@ export const createHeaderInfo = () => {
   </section>`
   );
 };
+
+export default class HeaderInfo {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createHeaderInfo();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

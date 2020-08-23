@@ -1,4 +1,24 @@
-export const createTripEdit = (waypoint = {}) => {
+import {
+  createElement, getRandomInteger
+} from "../util.js";
+import {TYPES, DESTINATION_CITIES, OFFERS, DESTINATION_DESC} from "../const.js";
+
+const OFFERS_AMOUNT = 3;
+
+const WAYPOINT_BLANK = {
+  typeWaypoint: TYPES[0],
+  destinationCity: DESTINATION_CITIES[0],
+  offers: OFFERS.slice(0, OFFERS_AMOUNT),
+  destinationInfo: {
+    description: DESTINATION_DESC[0],
+    photos: `http://picsum.photos/248/152?r=${Math.random()}`
+  },
+  startDate: Date.now(),
+  endDate: Date.now() + 10000000,
+  price: getRandomInteger(10, 300)
+};
+
+const createTripEdit = (waypoint) => {
   const {
     destinationCity,
     price,
@@ -7,8 +27,20 @@ export const createTripEdit = (waypoint = {}) => {
     typeWaypoint
   } = waypoint;
 
-  const currentDateStart = new Date(startDate).toLocaleString(`en-GB`, {day: `numeric`, month: `numeric`, year: `2-digit`, hour: `numeric`, minute: `numeric`});
-  const currentDateEnd = new Date(endDate).toLocaleString(`en-GB`, {day: `numeric`, month: `numeric`, year: `2-digit`, hour: `numeric`, minute: `numeric`});
+  const currentDateStart = new Date(startDate).toLocaleString(`en-GB`, {
+    day: `numeric`,
+    month: `numeric`,
+    year: `2-digit`,
+    hour: `numeric`,
+    minute: `numeric`
+  });
+  const currentDateEnd = new Date(endDate).toLocaleString(`en-GB`, {
+    day: `numeric`,
+    month: `numeric`,
+    year: `2-digit`,
+    hour: `numeric`,
+    minute: `numeric`
+  });
 
   const currentAction = (type) => {
     let action = ``;
@@ -24,8 +56,8 @@ export const createTripEdit = (waypoint = {}) => {
     return action;
   };
 
-  return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+  return `<li class="trip-events__item">
+  <form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -131,6 +163,29 @@ export const createTripEdit = (waypoint = {}) => {
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
-  </form>`
-  );
+  </form>
+  </li>`;
 };
+
+export default class TripEdit {
+  constructor(waypoint) {
+    this._waypoint = waypoint || WAYPOINT_BLANK;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEdit(this._waypoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

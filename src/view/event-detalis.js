@@ -1,8 +1,21 @@
-export const createEventDetalis = (waypoints = {}) => {
+import {createElement} from "../util";
+import {OFFERS, DESTINATION_DESC} from "../const.js";
+
+const OFFERS_AMOUNT = 3;
+
+const WAYPOINT_BLANK = {
+  offers: OFFERS.slice(0, OFFERS_AMOUNT),
+  destinationInfo: {
+    description: DESTINATION_DESC[0],
+    photos: `http://picsum.photos/248/152?r=${Math.random()}`
+  }
+};
+
+const createEventDetalis = (waypoint) => {
   const {
     destinationInfo,
     offers
-  } = waypoints;
+  } = waypoint;
 
   return (
     `<section class="event__details">
@@ -37,3 +50,26 @@ export const createEventDetalis = (waypoints = {}) => {
   </section>`
   );
 };
+
+export default class EventDetalis {
+  constructor(waypoint) {
+    this._waypoint = waypoint || WAYPOINT_BLANK;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventDetalis(this._waypoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

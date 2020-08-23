@@ -1,60 +1,16 @@
 import {
   getRandomInteger
 } from "../util.js";
+import {TYPES, DESTINATION_CITIES, OFFERS, DESTINATION_DESC} from "../const.js";
 
 const OFFERS_AMOUNT = 3;
 const WAYPOINTS_AMOUNT = 20;
-
-const types = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
 const getRandomArrayItem = (arr) => {
   const randomIndex = getRandomInteger(0, arr.length - 1);
 
   return arr[randomIndex];
 };
-
-const destinationsCity = [`Amsterdam`, `Chamonix`, `Geneva`, `Saint Petersburg`];
-
-const offers = [
-  {
-    name: `Add luggage`,
-    type: `luggage`,
-    price: 30,
-    checked: true
-  },
-  {
-    name: `Switch to comfort class`,
-    type: `comfort`,
-    price: 100,
-    checked: true
-  },
-  {
-    name: `Add meal`,
-    type: `meal`,
-    price: 15,
-    checked: false
-  },
-  {
-    name: `Choose seats`,
-    type: `seats`,
-    price: 5,
-    checked: false
-  },
-  {
-    name: `Travel by train`,
-    type: `train`,
-    price: 40,
-    checked: false
-  },
-];
-
-const destinationDesc = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`
-];
 
 const shuffleArray = (arr) => {
   for (let i = 0; i > arr.length; i++) {
@@ -76,11 +32,11 @@ const generateWaypoint = () => {
   const startDate = getRandomDate();
   const endDate = getRandomDate();
   return {
-    typeWaypoint: getRandomArrayItem(types),
-    destinationCity: getRandomArrayItem(destinationsCity),
-    offers: shuffleArray(offers).slice(0, OFFERS_AMOUNT),
+    typeWaypoint: getRandomArrayItem(TYPES),
+    destinationCity: getRandomArrayItem(DESTINATION_CITIES),
+    offers: shuffleArray(OFFERS).slice(0, OFFERS_AMOUNT),
     destinationInfo: {
-      description: getRandomArrayItem(destinationDesc),
+      description: getRandomArrayItem(DESTINATION_DESC),
       photos: `http://picsum.photos/248/152?r=${Math.random()}`
     },
     startDate: Math.min(startDate, endDate),

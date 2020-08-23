@@ -1,15 +1,15 @@
-import {createHeaderInfo} from "./view/header-info.js";
-import {createHeaderMenu} from "./view/header-menu.js";
-import {createHeaderFilter} from "./view/header-filter.js";
-import {createTripEdit} from "./view/trip-edit.js";
-import {createSort} from "./view/sort.js";
-import {createEventDetalis} from "./view/event-detalis.js";
-import {createTripDays} from "./view/trip-days.js";
-import {createDaysItem} from "./view/days-item.js";
-import {createWaypointTemplate} from "./view/waypoint.js";
-import {createTripInfo} from "./view/trip-info.js";
+import HeaderInfoView from "./view/header-info.js";
+import HeaderMenuView from "./view/header-menu.js";
+import HeaderFilterView from "./view/header-filter.js";
+import TripEditView from "./view/trip-edit.js";
+import SortView from "./view/sort.js";
+import EventDetalisView from "./view/event-detalis.js";
+import TripDaysListView from "./view/trip-days.js";
+import DaysItemView from "./view/days-item.js";
+import TripView from "./view/trip.js";
+import TripInfoView from "./view/trip-info.js";
 import {waypoints} from "./mock/mock.js";
-import {createElement, renderElement} from "./util.js";
+import {renderElement} from "./util.js";
 import {generateFilter} from "./mock/filter.js";
 import {generateSort} from "./mock/sort.js";
 
@@ -26,37 +26,73 @@ const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
 const siteMainElement = document.querySelector(`.page-main`);
 const tripEvents = siteMainElement.querySelector(`.trip-events`);
 
-renderElement(headerMain, createElement(createHeaderInfo()), `afterbegin`);
-renderElement(headerControls, createElement(createHeaderMenu()), `afterbegin`);
-renderElement(headerControls, createElement(createHeaderFilter(filters)), `beforeend`);
+const TripDaysListComponent = new TripDaysListView();
 
-renderElement(tripEvents, createElement(createSort(sorts)), `beforeend`);
-renderElement(tripEvents, createElement(createTripEdit(waypoints[0])), `beforeend`);
+renderElement(headerMain, new HeaderInfoView().getElement(), `afterbegin`);
+renderElement(headerControls, new HeaderMenuView().getElement(), `afterbegin`);
+renderElement(headerControls, new HeaderFilterView(filters).getElement(), `beforeend`);
 
-const tripItem = tripEvents.querySelector(`.trip-events__item`);
+renderElement(tripEvents, new SortView(sorts).getElement(), `beforeend`);
 
-renderElement(tripItem, createElement(createEventDetalis(waypoints[0])), `beforeend`);
 
 const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
 
-renderElement(tripHeaderInfo, createElement(createTripInfo(waypoints)), `afterbegin`);
-renderElement(tripEvents, createElement(createTripDays()), `beforeend`);
+renderElement(tripHeaderInfo, new TripInfoView(waypoints).getElement(), `afterbegin`);
+renderElement(tripEvents, TripDaysListComponent.getElement(), `beforeend`);
 
-const tripDays = tripEvents.querySelector(`.trip-days`);
 
+const renderWaypoint = (tripListElement, waypoint) => {
+  const tripComponent = new TripView(waypoint);
+  const tripEditComponent = new TripEditView(waypoint);
+
+  const eventDetalisComponent = new EventDetalisView(waypoint);
+
+  const replaceTripToForm = () => {
+    tripListElement.replaceChild(tripEditComponent.getElement(), tripComponent.getElement());
+  };
+
+  const replaceFormToTrip = () => {
+    tripListElement.replaceChild(tripComponent.getElement(), tripEditComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      replaceFormToTrip();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  tripComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceTripToForm();
+    renderElement(tripEditComponent.getElement(), eventDetalisComponent.getElement(), `beforeend`);
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  tripEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceFormToTrip();
+    eventDetalisComponent.getElement().remove();
+    eventDetalisComponent.removeElement();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  renderElement(tripListElement, tripComponent.getElement(), `beforeend`);
+};
 
 dates.forEach((date, dateIndex) => {
-  const day = createElement(createDaysItem(new Date(date), dateIndex + 1));
+  const day = new DaysItemView(new Date(date), dateIndex + 1).getElement();
 
   waypoints
     .filter((waypoint) => new Date(waypoint.startDate).toDateString() === date)
     .forEach((waypoint) => {
-      renderElement(day.querySelector(`.trip-events__list`), createElement(createWaypointTemplate(waypoint)), `beforeend`);
+      renderWaypoint(day.querySelector(`.trip-events__list`), waypoint);
     });
-  renderElement(tripDays, day, `beforeend`);
+  renderElement(TripDaysListComponent.getElement(), day, `beforeend`);
 });
 
 const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
 
 document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
+
 

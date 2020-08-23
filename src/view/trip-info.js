@@ -1,4 +1,6 @@
-export const createTripInfo = (waypoints) => {
+import {createElement} from "../util.js";
+
+const createTripInfo = (waypoints) => {
   const names = [
     ...new Set(waypoints.map((item) => {
       return item.destinationCity;
@@ -36,3 +38,26 @@ export const createTripInfo = (waypoints) => {
   </div>`
   );
 };
+
+export default class TripInfo {
+  constructor(waypoints) {
+    this._waypoints = waypoints;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfo(this._waypoints);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
