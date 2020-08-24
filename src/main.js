@@ -8,6 +8,7 @@ import TripDaysListView from "./view/trip-days.js";
 import DaysItemView from "./view/days-item.js";
 import TripView from "./view/trip.js";
 import TripInfoView from "./view/trip-info.js";
+import NoTripView from "./view/no-trip.js";
 import {waypoints} from "./mock/mock.js";
 import {renderElement} from "./util.js";
 import {generateFilter} from "./mock/filter.js";
@@ -32,19 +33,22 @@ renderElement(headerMain, new HeaderInfoView().getElement(), `afterbegin`);
 renderElement(headerControls, new HeaderMenuView().getElement(), `afterbegin`);
 renderElement(headerControls, new HeaderFilterView(filters).getElement(), `beforeend`);
 
-renderElement(tripEvents, new SortView(sorts).getElement(), `beforeend`);
 
+const bodyContainer = siteMainElement.querySelector(`.page-body__container`);
+if (!waypoints.length) {
+  renderElement(bodyContainer, new NoTripView().getElement(), `afterbegin`);
+} else {
+  renderElement(tripEvents, new SortView(sorts).getElement(), `beforeend`);
+}
 
 const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
 
 renderElement(tripHeaderInfo, new TripInfoView(waypoints).getElement(), `afterbegin`);
 renderElement(tripEvents, TripDaysListComponent.getElement(), `beforeend`);
 
-
 const renderWaypoint = (tripListElement, waypoint) => {
   const tripComponent = new TripView(waypoint);
   const tripEditComponent = new TripEditView(waypoint);
-
   const eventDetalisComponent = new EventDetalisView(waypoint);
 
   const replaceTripToForm = () => {
@@ -65,15 +69,13 @@ const renderWaypoint = (tripListElement, waypoint) => {
 
   tripComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     replaceTripToForm();
-    renderElement(tripEditComponent.getElement(), eventDetalisComponent.getElement(), `beforeend`);
+    renderElement(tripEditComponent.getElement().querySelector(`form`), eventDetalisComponent.getElement(), `beforeend`);
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
   tripEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceFormToTrip();
-    eventDetalisComponent.getElement().remove();
-    eventDetalisComponent.removeElement();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
@@ -82,6 +84,7 @@ const renderWaypoint = (tripListElement, waypoint) => {
 
 dates.forEach((date, dateIndex) => {
   const day = new DaysItemView(new Date(date), dateIndex + 1).getElement();
+
 
   waypoints
     .filter((waypoint) => new Date(waypoint.startDate).toDateString() === date)
