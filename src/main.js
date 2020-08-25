@@ -3,7 +3,6 @@ import HeaderMenuView from "./view/header-menu.js";
 import HeaderFilterView from "./view/header-filter.js";
 import TripEditView from "./view/trip-edit.js";
 import SortView from "./view/sort.js";
-import EventDetalisView from "./view/event-detalis.js";
 import TripDaysListView from "./view/trip-days.js";
 import DaysItemView from "./view/days-item.js";
 import TripView from "./view/trip.js";
@@ -49,7 +48,6 @@ renderElement(tripEvents, TripDaysListComponent.getElement(), `beforeend`);
 const renderWaypoint = (tripListElement, waypoint) => {
   const tripComponent = new TripView(waypoint);
   const tripEditComponent = new TripEditView(waypoint);
-  const eventDetalisComponent = new EventDetalisView(waypoint);
 
   const replaceTripToForm = () => {
     tripListElement.replaceChild(tripEditComponent.getElement(), tripComponent.getElement());
@@ -69,7 +67,6 @@ const renderWaypoint = (tripListElement, waypoint) => {
 
   tripComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     replaceTripToForm();
-    renderElement(tripEditComponent.getElement().querySelector(`form`), eventDetalisComponent.getElement(), `beforeend`);
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
