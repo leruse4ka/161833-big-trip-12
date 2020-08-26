@@ -1,22 +1,19 @@
 import {createElement} from "../util.js";
 
-const createHeaderInfo = () => {
-  return (
-    `<section class="trip-main__trip-info  trip-info">
-    <p class="trip-info__cost">
-    Total: &euro;&nbsp;<span class="trip-info__cost-value">0</span>
-    </p>
-  </section>`
-  );
+const createNoTripTemplate = () => {
+  return `<section class="trip-events">
+  <h2 class="visually-hidden">Trip events</h2>
+  <p class="trip-events__msg">Click New Event to create your first point</p>
+</section>`;
 };
 
-export default class HeaderInfo {
+export default class NoTrip {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createHeaderInfo();
+    return createNoTripTemplate();
   }
 
   getElement() {

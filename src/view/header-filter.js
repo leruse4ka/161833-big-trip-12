@@ -1,3 +1,5 @@
+import {createElement} from "../util.js";
+
 const createHeaderFilterItemTemplate = (filter, isChecked) => {
   const name = filter.name;
 
@@ -9,7 +11,7 @@ const createHeaderFilterItemTemplate = (filter, isChecked) => {
   );
 };
 
-export const createHeaderFilter = (filterItems) => {
+const createHeaderFilter = (filterItems) => {
   const filterItemsTemplate = filterItems.map((filter, index) => createHeaderFilterItemTemplate(filter, index === 0)).join(``);
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -18,3 +20,26 @@ export const createHeaderFilter = (filterItems) => {
   </form>`
   );
 };
+
+export default class HeaderFilter {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createHeaderFilter(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

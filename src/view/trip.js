@@ -1,4 +1,6 @@
-export const createWaypointTemplate = (waypoint) => {
+import {createElement} from "../util";
+
+const createTripTemplate = (waypoint) => {
   const {
     destinationCity,
     offers,
@@ -48,3 +50,26 @@ export const createWaypointTemplate = (waypoint) => {
   </li>`
   );
 };
+
+export default class Trip {
+  constructor(waypoint) {
+    this._waypoint = waypoint;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripTemplate(this._waypoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
