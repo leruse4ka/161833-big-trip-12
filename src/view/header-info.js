@@ -1,4 +1,5 @@
-import {createElement} from "../util.js";
+import AbstractView from "./abstract";
+
 
 const createHeaderInfo = () => {
   return (
@@ -10,24 +11,8 @@ const createHeaderInfo = () => {
   );
 };
 
-export default class HeaderInfo {
-  constructor() {
-    this._element = null;
-  }
-
+export default class HeaderInfo extends AbstractView {
   getTemplate() {
     return createHeaderInfo();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,13 +1,13 @@
 import {
-  createElement,
   getRandomInteger
-} from "../util.js";
+} from "../utils/common.js";
 import {
   TYPES,
   DESTINATION_CITIES,
   OFFERS,
   DESTINATION_DESC
 } from "../const.js";
+import AbstractView from "./abstract.js";
 
 const OFFERS_AMOUNT = 3;
 
@@ -210,25 +210,25 @@ const createTripEdit = (waypoint) => {
   </li>`;
 };
 
-export default class TripEdit {
+export default class TripEdit extends AbstractView {
   constructor(waypoint) {
+    super();
     this._waypoint = waypoint || WAYPOINT_BLANK;
-    this._element = null;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createTripEdit(this._waypoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
   }
 }
