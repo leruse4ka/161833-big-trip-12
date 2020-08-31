@@ -1,7 +1,5 @@
 export const sortTripTime = (tripA, tripB) => {
-  tripA = new Date(tripA.startDate).getTime();
-  tripB = new Date(tripB.startDate).getTime();
-  return tripB - tripA;
+  return (tripB.endDate - tripB.startDate) - (tripA.endDate - tripA.startDate);
 };
 
 export const sortTripPrice = (tripA, tripB) => {

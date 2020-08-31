@@ -1,4 +1,5 @@
 import AbstractView from "./abstract";
+import {getDuration} from "../utils/common.js";
 
 
 const createTripTemplate = (waypoint) => {
@@ -10,14 +11,14 @@ const createTripTemplate = (waypoint) => {
     endDate,
     typeWaypoint
   } = waypoint;
-
+  const durationTime = getDuration(endDate - startDate);
   const currentDateStart = new Date(startDate).toLocaleTimeString().slice(0, -3);
   const currentDateEnd = new Date(endDate).toLocaleTimeString().slice(0, -3);
 
   return `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${typeWaypoint}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${typeWaypoint.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${typeWaypoint} to ${destinationCity}</h3>
 
@@ -27,7 +28,7 @@ const createTripTemplate = (waypoint) => {
           &mdash;
           <time class="event__end-time" datetime="${currentDateEnd}">${currentDateEnd}</time>
         </p>
-        <p class="event__duration">1H 30M</p>
+        <p class="event__duration">${durationTime.d > 0 ? `${durationTime.d}D` : ``} ${durationTime.h > 0 ? `${durationTime.h}H` : ``} ${durationTime.m > 0 ? `${durationTime.m}M` : ``}</p>
       </div>
 
       <p class="event__price">

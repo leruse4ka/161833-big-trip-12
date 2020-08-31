@@ -7,8 +7,13 @@ import SortView from "../view/sort.js";
 import TripDaysListView from "../view/trip-days.js";
 import DaysItemView from "../view/days-item.js";
 import NoTripView from "../view/no-trip.js";
-import {SortType} from "../const.js";
-import {sortTripTime, sortTripPrice} from "../utils/trip.js";
+import {
+  SortType
+} from "../const.js";
+import {
+  sortTripTime,
+  sortTripPrice
+} from "../utils/trip.js";
 
 export default class Waypoint {
   constructor(tripContainer) {
@@ -16,7 +21,6 @@ export default class Waypoint {
 
     this._tripDaysListComponent = new TripDaysListView();
     this._sortComponent = new SortView();
-    this._daysItemComponent = new DaysItemView();
     this._noTripComponent = new NoTripView();
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._currentSortType = SortType.DEFAULT;
@@ -24,33 +28,31 @@ export default class Waypoint {
 
   init(trips) {
     this._trips = trips.slice();
-    this._sourcedTrip = trips.slice();
 
     this._renderWaypoint();
   }
 
   _sortTrips(sortType) {
+    let sortedTrips = [];
+    let isDefaultSorting = false;
     switch (sortType) {
       case SortType.TIME:
-        this._trips.sort(sortTripTime);
+        sortedTrips = this._trips.slice().sort(sortTripTime);
         break;
       case SortType.PRICE:
-        this._trips.sort(sortTripPrice);
+        sortedTrips = this._trips.slice().sort(sortTripPrice);
         break;
-      default:
-        this._trips = this._sourcedTrip.slice();
+      case SortType.DEFAULT:
+        sortedTrips = this._trips.slice();
+        isDefaultSorting = true;
     }
     this._currentSortType = sortType;
+    this._renderTripDaysList(sortedTrips, isDefaultSorting);
   }
 
   _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._sortTrips(sortType);
     this._clearTripList();
-    this._renderTripDaysList();
+    this._sortTrips(sortType);
   }
 
   _renderSort() {
@@ -91,9 +93,11 @@ export default class Waypoint {
     renderElement(tripListElement, tripComponent, `beforeend`);
   }
 
-  _renderTrips(date, day) {
-    this._trips
-      .filter((trip) => new Date(trip.startDate).toDateString() === date)
+  _renderTrips(date, day, isDefaultSorting, trips) {
+    trips
+      .filter((trip) => {
+        return isDefaultSorting ? new Date(trip.startDate).toDateString() === date : trip;
+      })
       .forEach((trip) => {
         this._renderTrip(day.querySelector(`.trip-events__list`), trip);
       });
@@ -105,14 +109,18 @@ export default class Waypoint {
     renderElement(bodyContainer, this._noTripComponent, `afterbegin`);
   }
 
-  _renderTripDays(trips) {
-    const dates = [
-      ...new Set(trips.map((item) => new Date(item.startDate).toDateString()))
-    ];
+  _renderTripDays(trips, isDefaultSorting = true) {
+
+    const dates = isDefaultSorting
+      ? [...new Set(trips.map((item) => new Date(item.startDate).toDateString()))]
+      : [true];
+
 
     dates.forEach((date, dateIndex) => {
-      const day = new DaysItemView(new Date(date), dateIndex + 1).getElement();
-      this._renderTrips(date, day);
+      const day = isDefaultSorting
+        ? new DaysItemView(new Date(date), dateIndex + 1).getElement()
+        : new DaysItemView().getElement();
+      this._renderTrips(date, day, isDefaultSorting, trips);
 
       renderElement(this._tripDaysListComponent, day, `beforeend`);
     });
@@ -122,10 +130,10 @@ export default class Waypoint {
     this._tripDaysListComponent.getElement().innerHTML = ``;
   }
 
-  _renderTripDaysList() {
+  _renderTripDaysList(trips, isDefaultSorting) {
     renderElement(this._tripContainer, this._tripDaysListComponent, `beforeend`);
 
-    this._renderTripDays(this._trips);
+    this._renderTripDays(trips, isDefaultSorting);
   }
 
   _renderWaypoint() {
@@ -133,7 +141,7 @@ export default class Waypoint {
       this._renderNoTrip();
     } else {
       this._renderSort();
-      this._renderTripDaysList();
+      this._renderTripDaysList(this._trips);
     }
 
   }
