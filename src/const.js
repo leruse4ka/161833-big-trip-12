@@ -40,3 +40,9 @@ export const DESTINATION_DESC = [
   `Aliquam id orci ut lectus varius viverra.`,
   `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`
 ];
+
+export const SortType = {
+  DEFAULT: `event`,
+  TIME: `time`,
+  PRICE: `price`,
+};

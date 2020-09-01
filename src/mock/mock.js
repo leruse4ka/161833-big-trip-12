@@ -1,6 +1,6 @@
 import {
   getRandomInteger
-} from "../util.js";
+} from "../utils/common.js";
 import {TYPES, DESTINATION_CITIES, OFFERS, DESTINATION_DESC} from "../const.js";
 
 const OFFERS_AMOUNT = 3;

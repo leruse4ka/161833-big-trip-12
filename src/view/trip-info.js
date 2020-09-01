@@ -1,4 +1,4 @@
-import {createElement} from "../util.js";
+import AbstractView from "./abstract.js";
 
 const getRoute = (waypoints) => {
   if (!waypoints.length) {
@@ -43,25 +43,13 @@ const createTripInfo = (waypoints) => {
   );
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractView {
   constructor(waypoints) {
+    super();
     this._waypoints = waypoints;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfo(this._waypoints);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
