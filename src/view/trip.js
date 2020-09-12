@@ -1,6 +1,6 @@
 import AbstractView from "./abstract";
-import {getDuration} from "../utils/common.js";
-
+import {getDuration, capitalize} from "../utils/common.js";
+import {currentAction} from "../utils/trip.js";
 
 const createTripTemplate = (waypoint) => {
   const {
@@ -9,7 +9,7 @@ const createTripTemplate = (waypoint) => {
     price,
     startDate,
     endDate,
-    typeWaypoint
+    typeWaypoint,
   } = waypoint;
   const durationTime = getDuration(endDate - startDate);
   const currentDateStart = new Date(startDate).toLocaleTimeString().slice(0, -3);
@@ -18,9 +18,9 @@ const createTripTemplate = (waypoint) => {
   return `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${typeWaypoint.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${typeWaypoint}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${typeWaypoint} to ${destinationCity}</h3>
+      <h3 class="event__title">${capitalize(typeWaypoint)} ${currentAction(typeWaypoint)} ${destinationCity}</h3>
 
       <div class="event__schedule">
         <p class="event__time">

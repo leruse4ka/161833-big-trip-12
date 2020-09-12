@@ -1,5 +1,3 @@
-import TripEditView from "../view/trip-edit.js";
-import TripView from "../view/trip.js";
 import {
   renderElement
 } from "../utils/render.js";
@@ -14,22 +12,39 @@ import {
   sortTripTime,
   sortTripPrice
 } from "../utils/trip.js";
+import WaypointPresenter from "./waypoint.js";
+import {updateItem} from "../utils/common.js";
 
-export default class Waypoint {
+export default class WaypointBoard {
   constructor(tripContainer) {
     this._tripContainer = tripContainer;
 
     this._tripDaysListComponent = new TripDaysListView();
     this._sortComponent = new SortView();
     this._noTripComponent = new NoTripView();
-    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._currentSortType = SortType.DEFAULT;
+    this._waypointPresenter = {};
+
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleTripChange = this._handleTripChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(trips) {
     this._trips = trips.slice();
 
     this._renderWaypoint();
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._waypointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  _handleTripChange(updatedTrip) {
+    this._trips = updateItem(this._trips, updatedTrip);
+    this._waypointPresenter[updatedTrip.id].init(updatedTrip);
   }
 
   _sortTrips(sortType) {
@@ -61,36 +76,9 @@ export default class Waypoint {
   }
 
   _renderTrip(tripListElement, trip) {
-    const tripComponent = new TripView(trip);
-    const tripEditComponent = new TripEditView(trip);
-
-    const replaceTripToForm = () => {
-      tripListElement.replaceChild(tripEditComponent.getElement(), tripComponent.getElement());
-    };
-
-    const replaceFormToTrip = () => {
-      tripListElement.replaceChild(tripComponent.getElement(), tripEditComponent.getElement());
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        replaceFormToTrip();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    tripComponent.setEditClickHandler(() => {
-      replaceTripToForm();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-    tripEditComponent.setFormSubmitHandler(() => {
-      replaceFormToTrip();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    renderElement(tripListElement, tripComponent, `beforeend`);
+    const waypointPresenter = new WaypointPresenter(tripListElement, this._handleTripChange, this._handleModeChange);
+    waypointPresenter.init(trip);
+    this._waypointPresenter[trip.id] = waypointPresenter;
   }
 
   _renderTrips(date, day, isDefaultSorting, trips) {
@@ -127,7 +115,10 @@ export default class Waypoint {
   }
 
   _clearTripList() {
-    this._tripDaysListComponent.getElement().innerHTML = ``;
+    Object
+      .values(this._waypointPresenter)
+      .forEach((presenter) => presenter.destroy());
+    this._waypointPresenter = {};
   }
 
   _renderTripDaysList(trips, isDefaultSorting) {

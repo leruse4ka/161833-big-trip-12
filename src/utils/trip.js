@@ -5,3 +5,17 @@ export const sortTripTime = (tripA, tripB) => {
 export const sortTripPrice = (tripA, tripB) => {
   return tripB.price - tripA.price;
 };
+
+export const currentAction = (type) => {
+  let action = ``;
+  switch (type) {
+    case `check-in`:
+    case `sightseeing`:
+    case `restaurant`:
+      action = `in`;
+      break;
+    default:
+      action = `to`;
+  }
+  return action;
+};

@@ -1,7 +1,7 @@
 import HeaderInfoView from "./view/header-info.js";
 import HeaderMenuView from "./view/header-menu.js";
 import HeaderFilterView from "./view/header-filter.js";
-import TripPresenter from "./presenter/trip.js";
+import BoardPresenter from "./presenter/board.js";
 import TripInfoView from "./view/trip-info.js";
 import {waypoints} from "./mock/mock.js";
 import {renderElement} from "./utils/render.js";
@@ -27,6 +27,6 @@ const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
 
 document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
 
-const tripPresenter = new TripPresenter(tripEvents);
+const tripPresenter = new BoardPresenter(tripEvents);
 
 tripPresenter.init(waypoints);

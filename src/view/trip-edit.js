@@ -1,5 +1,6 @@
 import {
-  getRandomInteger
+  getRandomInteger,
+  capitalize
 } from "../utils/common.js";
 import {
   TYPES,
@@ -7,7 +8,8 @@ import {
   OFFERS,
   DESTINATION_DESC
 } from "../const.js";
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
+import {currentAction} from "../utils/trip.js";
 
 const OFFERS_AMOUNT = 3;
 
@@ -21,7 +23,8 @@ const WAYPOINT_BLANK = {
   },
   startDate: Date.now(),
   endDate: Date.now() + 10000000,
-  price: getRandomInteger(10, 300)
+  price: getRandomInteger(10, 300),
+  isFavorite: true
 };
 
 const createEventDetalis = (offers, destinationInfo) => {
@@ -57,7 +60,7 @@ const createEventDetalis = (offers, destinationInfo) => {
 </section>`;
 };
 
-const createTripEdit = (waypoint) => {
+const createTripEdit = (data) => {
   const {
     offers,
     destinationInfo,
@@ -65,8 +68,9 @@ const createTripEdit = (waypoint) => {
     price,
     startDate,
     endDate,
-    typeWaypoint
-  } = waypoint;
+    typeWaypoint,
+    isFavorite
+  } = data;
 
   const currentDateStart = new Date(startDate).toLocaleString(`en-GB`, {
     day: `numeric`,
@@ -83,27 +87,13 @@ const createTripEdit = (waypoint) => {
     minute: `numeric`
   });
 
-  const currentAction = (type) => {
-    let action = ``;
-    switch (type) {
-      case `Check-in`:
-      case `Sightseeing`:
-      case `Restaurant`:
-        action = `in`;
-        break;
-      default:
-        action = `to`;
-    }
-    return action;
-  };
-
   return `<li class="trip-events__item">
   <form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${typeWaypoint.toLowerCase() ? typeWaypoint : ``}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${typeWaypoint ? typeWaypoint : ``}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -170,7 +160,7 @@ const createTripEdit = (waypoint) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${typeWaypoint ? typeWaypoint : ``} ${currentAction(typeWaypoint)}
+          ${typeWaypoint ? capitalize(typeWaypoint) : ``} ${currentAction(typeWaypoint)}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationCity ? destinationCity : ``}" list="destination-list-1">
         <datalist id="destination-list-1">
@@ -204,7 +194,7 @@ const createTripEdit = (waypoint) => {
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
 
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
                       <label class="event__favorite-btn" for="event-favorite-1">
                         <span class="visually-hidden">Add to favorite</span>
                         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -222,25 +212,74 @@ const createTripEdit = (waypoint) => {
   </li>`;
 };
 
-export default class TripEdit extends AbstractView {
-  constructor(waypoint) {
+export default class TripEdit extends SmartView {
+  constructor(waypoint = WAYPOINT_BLANK) {
     super();
-    this._waypoint = waypoint || WAYPOINT_BLANK;
+    this._data = TripEdit.parseTripToData(waypoint);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._isFavoriteHandler = this._isFavoriteHandler.bind(this);
+    this._typeHandler = this._typeHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  reset(waypoint) {
+    this.updateData(
+        TripEdit.parseTripToData(waypoint)
+    );
   }
 
   getTemplate() {
-    return createTripEdit(this._waypoint);
+    return createTripEdit(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFavoriteClickHandler(this._callback.isFavorite);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._typeHandler);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(TripEdit.parseDataToTrip(this._data));
+  }
+
+  _isFavoriteHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _typeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      typeWaypoint: evt.target.value
+    }, false);
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, this._isFavoriteHandler);
+  }
+
+  static parseTripToData(waypoint) {
+    return Object.assign({}, waypoint);
+  }
+
+  static parseDataToTrip(data) {
+    data = Object.assign({}, data);
+
+    return data;
   }
 }
