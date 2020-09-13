@@ -10,6 +10,9 @@ import {
 } from "../const.js";
 import SmartView from "./smart.js";
 import {currentAction} from "../utils/trip.js";
+import flatpickr from "flatpickr";
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const OFFERS_AMOUNT = 3;
 
@@ -216,12 +219,16 @@ export default class TripEdit extends SmartView {
   constructor(waypoint = WAYPOINT_BLANK) {
     super();
     this._data = TripEdit.parseTripToData(waypoint);
+    this._datepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._isFavoriteHandler = this._isFavoriteHandler.bind(this);
     this._typeHandler = this._typeHandler.bind(this);
+    this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
+    this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   reset(waypoint) {
@@ -236,8 +243,34 @@ export default class TripEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFavoriteClickHandler(this._callback.isFavorite);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+  }
+
+  _setDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+
+    this._datepicker = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._data.startDate,
+          onChange: this._dateStartChangeHandler
+        }
+    );
+
+    this._datepicker = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._data.endDate,
+          onChange: this._dateEndChangeHandler
+        }
+    );
   }
 
   _setInnerHandlers() {
@@ -261,6 +294,18 @@ export default class TripEdit extends SmartView {
     this.updateData({
       typeWaypoint: evt.target.value
     }, false);
+  }
+
+  _dateStartChangeHandler([userDate]) {
+    this.updateData({
+      startDate: userDate
+    });
+  }
+
+  _dateEndChangeHandler([userDate]) {
+    this.updateData({
+      endDate: userDate
+    });
   }
 
   setFormSubmitHandler(callback) {

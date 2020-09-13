@@ -11,7 +11,7 @@ const createTripTemplate = (waypoint) => {
     endDate,
     typeWaypoint,
   } = waypoint;
-  const durationTime = getDuration(endDate - startDate);
+  const durationTime = getDuration(endDate, startDate);
   const currentDateStart = new Date(startDate).toLocaleTimeString().slice(0, -3);
   const currentDateEnd = new Date(endDate).toLocaleTimeString().slice(0, -3);
 

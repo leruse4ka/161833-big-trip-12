@@ -1,4 +1,5 @@
 import {
+  remove,
   renderElement
 } from "../utils/render.js";
 import SortView from "../view/sort.js";
@@ -118,7 +119,13 @@ export default class WaypointBoard {
     Object
       .values(this._waypointPresenter)
       .forEach((presenter) => presenter.destroy());
+
+    this._clearTripDaysList();
     this._waypointPresenter = {};
+  }
+
+  _clearTripDaysList() {
+    remove(this._tripDaysListComponent);
   }
 
   _renderTripDaysList(trips, isDefaultSorting) {
