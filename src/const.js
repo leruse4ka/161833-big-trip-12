@@ -1,4 +1,5 @@
 export const TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+
 export const DESTINATION_CITIES = [`Amsterdam`, `Chamonix`, `Geneva`, `Saint Petersburg`];
 export const OFFERS = [
   {
@@ -45,4 +46,22 @@ export const SortType = {
   DEFAULT: `event`,
   TIME: `time`,
   PRICE: `price`,
+};
+
+export const UserAction = {
+  UPDATE_TRIP: `UPDATE_TRIP`,
+  ADD_TRIP: `ADD_TRIP`,
+  DELETE_TRIP: `DELETE_TRIP`
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
 };

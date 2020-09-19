@@ -1,12 +1,12 @@
 import {
   getRandomInteger
 } from "../utils/common.js";
-import {TYPES, DESTINATION_CITIES, OFFERS, DESTINATION_DESC} from "../const.js";
+import {TYPES, OFFERS, DESTINATION_CITIES, DESTINATION_DESC} from "../const.js";
 
 const OFFERS_AMOUNT = 3;
 const WAYPOINTS_AMOUNT = 20;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const getRandomArrayItem = (arr) => {
   const randomIndex = getRandomInteger(0, arr.length - 1);
@@ -36,12 +36,17 @@ const generateWaypoint = () => {
   return {
     id: generateId(),
     typeWaypoint: getRandomArrayItem(TYPES),
-    destinationCity: getRandomArrayItem(DESTINATION_CITIES),
     offers: shuffleArray(OFFERS).slice(0, OFFERS_AMOUNT),
     isFavorite: Boolean(getRandomInteger(0, 1)),
-    destinationInfo: {
+    destination: {
       description: getRandomArrayItem(DESTINATION_DESC),
-      photos: `http://picsum.photos/248/152?r=${Math.random()}`
+      name: getRandomArrayItem(DESTINATION_CITIES),
+      pictures: [
+        {
+          src: `http://picsum.photos/248/152?r=${Math.random()}`,
+          description: `Chamonix parliament building`
+        }
+      ]
     },
     startDate: Math.min(startDate, endDate),
     endDate: Math.max(startDate, endDate),

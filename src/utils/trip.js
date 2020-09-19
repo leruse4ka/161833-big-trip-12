@@ -1,3 +1,4 @@
+import moment from "moment";
 export const sortTripTime = (tripA, tripB) => {
   return (tripB.endDate - tripB.startDate) - (tripA.endDate - tripA.startDate);
 };
@@ -18,4 +19,8 @@ export const currentAction = (type) => {
       action = `to`;
   }
   return action;
+};
+
+export const isDateEqual = (dateA, dateB) => {
+  return moment(dateA).isSame(dateB, `day`);
 };

@@ -1,19 +1,19 @@
 import AbstractView from "./abstract";
 
 
-const createHeaderFilterItemTemplate = (filter, isChecked) => {
-  const name = filter.name;
+const createHeaderFilterItemTemplate = (filter, currentFilterType) => {
+  const {type, name} = filter;
 
   return (
     `<div class="trip-filters__filter">
-      <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``}>
-      <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
+      <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${type === currentFilterType ? `checked` : ``} >
+      <label class="trip-filters__filter-label" for="filter-${type}">${name}</label>
     </div>`
   );
 };
 
-const createHeaderFilter = (filterItems) => {
-  const filterItemsTemplate = filterItems.map((filter, index) => createHeaderFilterItemTemplate(filter, index === 0)).join(``);
+const createHeaderFilter = (filterItems, currentFilterType) => {
+  const filterItemsTemplate = filterItems.map((filter) => createHeaderFilterItemTemplate(filter, currentFilterType)).join(``);
   return (
     `<form class="trip-filters" action="#" method="get">
     ${filterItemsTemplate}
@@ -23,12 +23,25 @@ const createHeaderFilter = (filterItems) => {
 };
 
 export default class HeaderFilter extends AbstractView {
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this._filters = filters;
+    this._currentFilter = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createHeaderFilter(this._filters);
+    return createHeaderFilter(this._filters, this._currentFilter);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener(`change`, this._filterTypeChangeHandler);
   }
 }
