@@ -7,6 +7,7 @@ import {waypoints} from "./mock/mock.js";
 import {renderElement} from "./utils/render.js";
 import WaypointsModel from "./model/waypoint.js";
 import FilterModel from "./model/filter.js";
+import {MenuItem} from "./const.js";
 
 const filterModel = new FilterModel();
 
@@ -15,9 +16,10 @@ const headerMain = siteHeaderElement.querySelector(`.trip-main`);
 const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
 const siteMainElement = document.querySelector(`.page-main`);
 const tripEvents = siteMainElement.querySelector(`.trip-events`);
+const headerMenuComponent = new HeaderMenuView();
 
 renderElement(headerMain, new HeaderInfoView(), `afterbegin`);
-renderElement(headerControls, new HeaderMenuView(), `afterbegin`);
+renderElement(headerControls, headerMenuComponent, `afterbegin`);
 
 const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
 
@@ -26,6 +28,19 @@ renderElement(tripHeaderInfo, new TripInfoView(waypoints), `afterbegin`);
 const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
 
 document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
+
+const handleHeaderMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.STATS:
+
+      break;
+    case MenuItem.TABLE:
+
+      break;
+  }
+};
+
+headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
 
 const waypointsModel = new WaypointsModel();
 waypointsModel.setWaypoints(waypoints);

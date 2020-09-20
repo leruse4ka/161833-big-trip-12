@@ -218,10 +218,11 @@ const createTripEdit = (data) => {
 };
 
 export default class TripEdit extends SmartView {
-  constructor(waypoint = WAYPOINT_BLANK) {
+  constructor(waypoint = WAYPOINT_BLANK, isNew) {
     super();
     this._data = TripEdit.parseTripToData(waypoint);
     this._datepicker = null;
+    this._isNew = isNew;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -230,6 +231,7 @@ export default class TripEdit extends SmartView {
     this._typeHandler = this._typeHandler.bind(this);
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
+    this._priceHandler = this._priceHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -251,7 +253,7 @@ export default class TripEdit extends SmartView {
   }
 
   getTemplate() {
-    return createTripEdit(this._data);
+    return createTripEdit(this._data, this._isNew);
   }
 
   restoreHandlers() {
@@ -290,6 +292,9 @@ export default class TripEdit extends SmartView {
 
   _setInnerHandlers() {
     this.getElement()
+      .querySelector(`#event-price-1`)
+      .addEventListener(`change`, this._priceHandler);
+    this.getElement()
       .querySelector(`.event__type-list`)
       .addEventListener(`change`, this._typeHandler);
   }
@@ -308,6 +313,12 @@ export default class TripEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       typeWaypoint: evt.target.value
+    }, false);
+  }
+
+  _priceHandler(evt) {
+    this.updateData({
+      price: evt.target.value
     }, false);
   }
 

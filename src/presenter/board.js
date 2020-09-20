@@ -40,7 +40,11 @@ export default class WaypointBoard {
     this._waypointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._waypointNewPresenter = new WaypointNewPresenter(this._tripDaysListComponent, this._handleViewAction);
+    if (this._waypointsModel.getWaypoints().length < 1) {
+      this._waypointNewPresenter = new WaypointNewPresenter(this._tripContainer, this._handleViewAction, `afterbegin`);
+    } else {
+      this._waypointNewPresenter = new WaypointNewPresenter(this._tripDaysListComponent, this._handleViewAction, `beforebegin`);
+    }
   }
 
   init() {
@@ -142,9 +146,7 @@ export default class WaypointBoard {
   }
 
   _renderNoTrip() {
-    const bodyContainer = document.querySelector(`.page-main .page-body__container`);
-
-    renderElement(bodyContainer, this._noTripComponent, `afterbegin`);
+    renderElement(this._tripContainer, this._noTripComponent, `afterbegin`);
   }
 
   _renderTripDays(trips, isDefaultSorting = true) {

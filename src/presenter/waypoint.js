@@ -34,7 +34,7 @@ export default class Waypoint {
     const prevTripEditComponent = this._tripEditComponent;
 
     this._tripComponent = new TripView(trip);
-    this._tripEditComponent = new TripEditView(trip);
+    this._tripEditComponent = new TripEditView(trip, false);
 
     this._tripComponent.setEditClickHandler(this._editClickHandler);
     this._tripEditComponent.setFormSubmitHandler(this._formSubmitHandler);

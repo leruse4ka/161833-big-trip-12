@@ -1,6 +1,5 @@
 import AbstractView from "./abstract";
 
-
 const createHeaderInfo = () => {
   return (
     `<section class="trip-main__trip-info  trip-info">

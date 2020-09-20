@@ -4,9 +4,10 @@ import {remove, renderElement} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
 export default class WaypointNew {
-  constructor(waypointListContainer, changeData) {
+  constructor(waypointListContainer, changeData, renderPosition) {
     this._waypointListContainer = waypointListContainer;
     this._changeData = changeData;
+    this._renderPosition = renderPosition;
 
     this._tripEditComponent = null;
 
@@ -28,7 +29,7 @@ export default class WaypointNew {
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._tripEditComponent.setCloseClickHandler(this._closeClickHandler);
 
-    renderElement(this._waypointListContainer, this._tripEditComponent, `beforebegin`);
+    renderElement(this._waypointListContainer, this._tripEditComponent, this._renderPosition);
 
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
