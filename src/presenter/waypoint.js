@@ -1,6 +1,8 @@
 import TripEditView from "../view/trip-edit.js";
 import TripView from "../view/trip.js";
 import {remove, renderElement, replace} from "../utils/render.js";
+import {UserAction, UpdateType} from "../const.js";
+import {isDateEqual} from "../utils//trip.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -18,9 +20,11 @@ export default class Waypoint {
     this._mode = Mode.DEFAULT;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(trip) {
@@ -30,11 +34,13 @@ export default class Waypoint {
     const prevTripEditComponent = this._tripEditComponent;
 
     this._tripComponent = new TripView(trip);
-    this._tripEditComponent = new TripEditView(trip);
+    this._tripEditComponent = new TripEditView(trip, false);
 
     this._tripComponent.setEditClickHandler(this._editClickHandler);
     this._tripEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._tripEditComponent.setCloseClickHandler(this._closeClickHandler);
+    this._tripEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevTripComponent === null || prevTripEditComponent === null) {
       renderElement(this._tripListComponent, this._tripComponent, `beforeend`);
@@ -66,10 +72,22 @@ export default class Waypoint {
     document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  _formSubmitHandler(trip) {
-    this._changeData(trip);
+  _formSubmitHandler(update) {
+    const isMinorUpdate = !isDateEqual(this._trip.startDate, update.startDate);
+    this._changeData(
+        UserAction.UPDATE_TRIP,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        update);
     this._replaceFormToTrip();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _handleDeleteClick(waypoint) {
+    this._changeData(
+        UserAction.DELETE_TRIP,
+        UpdateType.MINOR,
+        waypoint
+    );
   }
 
   _onEscKeyDown(evt) {
@@ -81,8 +99,16 @@ export default class Waypoint {
     }
   }
 
+  _closeClickHandler() {
+    this._tripEditComponent.reset(this._trip);
+    this._replaceFormToTrip();
+    document.removeEventListener(`click`, this._closeClickHandler);
+  }
+
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_TRIP,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._trip,

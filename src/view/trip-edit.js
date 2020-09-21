@@ -4,9 +4,7 @@ import {
 } from "../utils/common.js";
 import {
   TYPES,
-  DESTINATION_CITIES,
   OFFERS,
-  DESTINATION_DESC
 } from "../const.js";
 import SmartView from "./smart.js";
 import {currentAction} from "../utils/trip.js";
@@ -18,19 +16,24 @@ const OFFERS_AMOUNT = 3;
 
 const WAYPOINT_BLANK = {
   typeWaypoint: TYPES[0],
-  destinationCity: DESTINATION_CITIES[0],
-  offers: OFFERS.slice(0, OFFERS_AMOUNT),
-  destinationInfo: {
-    description: DESTINATION_DESC[0],
-    photos: `http://picsum.photos/248/152?r=${Math.random()}`
+  destination: {
+    description: `Chamonix, is a beautiful city, a true asian pearl, with crowded streets.`,
+    name: `Chamonix`,
+    pictures: [
+      {
+        src: `http://picsum.photos/248/152?r=${Math.random()}`,
+        description: `Chamonix parliament building`
+      }
+    ]
   },
+  offers: OFFERS.slice(0, OFFERS_AMOUNT),
   startDate: Date.now(),
   endDate: Date.now() + 10000000,
   price: getRandomInteger(10, 300),
   isFavorite: true
 };
 
-const createEventDetalis = (offers, destinationInfo) => {
+const createEventDetalis = (offers, destination) => {
   return `<section class="event__details">
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -52,11 +55,11 @@ const createEventDetalis = (offers, destinationInfo) => {
 
   <section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destinationInfo.description}</p>
+    <p class="event__destination-description">${destination.description}</p>
 
     <div class="event__photos-container">
       <div class="event__photos-tape">
-        <img class="event__photo" src="${destinationInfo.photos}" alt="Event photo">
+        <img class="event__photo" src="${destination.pictures[0].src}" alt="${destination.pictures[0].description}">
       </div>
     </div>
   </section>
@@ -66,8 +69,7 @@ const createEventDetalis = (offers, destinationInfo) => {
 const createTripEdit = (data) => {
   const {
     offers,
-    destinationInfo,
-    destinationCity,
+    destination,
     price,
     startDate,
     endDate,
@@ -105,37 +107,37 @@ const createTripEdit = (data) => {
             <legend class="visually-hidden">Transfer</legend>
 
             <div class="event__type-item">
-              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${typeWaypoint === `taxi` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" checked>
+              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${typeWaypoint === `bus` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${typeWaypoint === `train` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${typeWaypoint === `ship` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${typeWaypoint === `transport` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${typeWaypoint === `drive` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
+              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${typeWaypoint === `flight` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
             </div>
           </fieldset>
@@ -144,17 +146,17 @@ const createTripEdit = (data) => {
             <legend class="visually-hidden">Activity</legend>
 
             <div class="event__type-item">
-              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${typeWaypoint === `check-in` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${typeWaypoint === `sightseeing` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${typeWaypoint === `restaurant` ? `checked` : ``}>
               <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
             </div>
           </fieldset>
@@ -165,7 +167,7 @@ const createTripEdit = (data) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${typeWaypoint ? capitalize(typeWaypoint) : ``} ${currentAction(typeWaypoint)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationCity ? destinationCity : ``}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? destination.name : ``}" list="destination-list-1">
         <datalist id="destination-list-1">
           <option value="Amsterdam"></option>
           <option value="Geneva"></option>
@@ -191,7 +193,7 @@ const createTripEdit = (data) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price ? price : ``}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price ? price : ``}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -209,26 +211,39 @@ const createTripEdit = (data) => {
                         <span class="visually-hidden">Open event</span>
                       </button>
     </header>
-    ${destinationCity ? createEventDetalis(offers, destinationInfo) : ``}
+    ${destination ? createEventDetalis(offers, destination) : ``}
 
   </form>
   </li>`;
 };
 
 export default class TripEdit extends SmartView {
-  constructor(waypoint = WAYPOINT_BLANK) {
+  constructor(waypoint = WAYPOINT_BLANK, isNew) {
     super();
     this._data = TripEdit.parseTripToData(waypoint);
     this._datepicker = null;
+    this._isNew = isNew;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._isFavoriteHandler = this._isFavoriteHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._typeHandler = this._typeHandler.bind(this);
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
+    this._priceHandler = this._priceHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
   }
 
   reset(waypoint) {
@@ -238,7 +253,7 @@ export default class TripEdit extends SmartView {
   }
 
   getTemplate() {
-    return createTripEdit(this._data);
+    return createTripEdit(this._data, this._isNew);
   }
 
   restoreHandlers() {
@@ -246,6 +261,8 @@ export default class TripEdit extends SmartView {
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setDatepicker() {
@@ -275,6 +292,9 @@ export default class TripEdit extends SmartView {
 
   _setInnerHandlers() {
     this.getElement()
+      .querySelector(`#event-price-1`)
+      .addEventListener(`change`, this._priceHandler);
+    this.getElement()
       .querySelector(`.event__type-list`)
       .addEventListener(`change`, this._typeHandler);
   }
@@ -296,6 +316,12 @@ export default class TripEdit extends SmartView {
     }, false);
   }
 
+  _priceHandler(evt) {
+    this.updateData({
+      price: evt.target.value
+    }, false);
+  }
+
   _dateStartChangeHandler([userDate]) {
     this.updateData({
       startDate: userDate
@@ -308,6 +334,11 @@ export default class TripEdit extends SmartView {
     });
   }
 
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
+  }
+
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
@@ -316,6 +347,21 @@ export default class TripEdit extends SmartView {
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, this._isFavoriteHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(TripEdit.parseDataToTrip(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   static parseTripToData(waypoint) {

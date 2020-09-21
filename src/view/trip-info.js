@@ -6,7 +6,7 @@ const getRoute = (waypoints) => {
   }
   const names = [
     ...new Set(waypoints.map((item) => {
-      return item.destinationCity;
+      return item.destination.name;
     }))
   ];
 
