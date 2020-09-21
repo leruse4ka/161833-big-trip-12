@@ -1,5 +1,5 @@
 import {Types} from "../const";
-import { getDurationMs } from "./common";
+import {getDurationMs} from "./common";
 
 export const typesWithImg = {
   [Types.BUS]: `🚌 BUS`,
@@ -14,63 +14,54 @@ export const typesWithImg = {
   [Types.TRANSPORT]: `🚊 TRANSPORT`
 };
 
+const filterWaypoints = (waypoints) => {
+  return {
+    typeBus: waypoints.filter((waypoint) => waypoint.typeWaypoint === `bus`),
+    typeCheckIn: waypoints.filter((waypoint) => waypoint.typeWaypoint === `check-in`),
+    typeDrive: waypoints.filter((waypoint) => waypoint.typeWaypoint === `drive`),
+    typeFlight: waypoints.filter((waypoint) => waypoint.typeWaypoint === `flight`),
+    typeRestaurant: waypoints.filter((waypoint) => waypoint.typeWaypoint === `restaurant`),
+    typeShip: waypoints.filter((waypoint) => waypoint.typeWaypoint === `ship`),
+    typeSightseeing: waypoints.filter((waypoint) => waypoint.typeWaypoint === `sightseeing`),
+    typeTaxi: waypoints.filter((waypoint) => waypoint.typeWaypoint === `taxi`),
+    typeTrain: waypoints.filter((waypoint) => waypoint.typeWaypoint === `train`),
+    typeTransport: waypoints.filter((waypoint) => waypoint.typeWaypoint === `transport`),
+  };
+};
+
 export const sumPriceTypes = (waypoints) => {
-  const typeBus = waypoints.filter((waypoint) => waypoint.typeWaypoint === `bus`).reduce((acc, item) => acc + item.price, 0);
-  const typeCheckIn = waypoints.filter((waypoint) => waypoint.typeWaypoint === `check-in`).reduce((acc, item) => acc + item.price, 0);
-  const typeDrive = waypoints.filter((waypoint) => waypoint.typeWaypoint === `drive`).reduce((acc, item) => acc + item.price, 0);
-  const typeFlight = waypoints.filter((waypoint) => waypoint.typeWaypoint === `flight`).reduce((acc, item) => acc + item.price, 0);
-  const typeRestaurant = waypoints.filter((waypoint) => waypoint.typeWaypoint === `restaurant`).reduce((acc, item) => acc + item.price, 0);
-  const typeShip = waypoints.filter((waypoint) => waypoint.typeWaypoint === `ship`).reduce((acc, item) => acc + item.price, 0);
-  const typeSightseeing = waypoints.filter((waypoint) => waypoint.typeWaypoint === `sightseeing`).reduce((acc, item) => acc + item.price, 0);
-  const typeTaxi = waypoints.filter((waypoint) => waypoint.typeWaypoint === `taxi`).reduce((acc, item) => acc + item.price, 0);
-  const typeTrain = waypoints.filter((waypoint) => waypoint.typeWaypoint === `train`).reduce((acc, item) => acc + item.price, 0);
-  const typeTransport = waypoints.filter((waypoint) => waypoint.typeWaypoint === `transport`).reduce((acc, item) => acc + item.price, 0);
+  const filtered = filterWaypoints(waypoints);
 
   return {
-    [Types.BUS]: typeBus,
-    [Types.CHECK_IN]: typeCheckIn,
-    [Types.DRIVE]: typeDrive,
-    [Types.FLIGHT]: typeFlight,
-    [Types.RESTAURANT]: typeRestaurant,
-    [Types.SHIP]: typeShip,
-    [Types.SIGHTSEEING]: typeSightseeing,
-    [Types.TAXI]: typeTaxi,
-    [Types.TRAIN]: typeTrain,
-    [Types.TRANSPORT]: typeTransport
+    [Types.BUS]: filtered.typeBus.reduce((acc, item) => acc + item.price, 0),
+    [Types.CHECK_IN]: filtered.typeCheckIn.reduce((acc, item) => acc + item.price, 0),
+    [Types.DRIVE]: filtered.typeDrive.reduce((acc, item) => acc + item.price, 0),
+    [Types.FLIGHT]: filtered.typeFlight.reduce((acc, item) => acc + item.price, 0),
+    [Types.RESTAURANT]: filtered.typeRestaurant.reduce((acc, item) => acc + item.price, 0),
+    [Types.SHIP]: filtered.typeShip.reduce((acc, item) => acc + item.price, 0),
+    [Types.SIGHTSEEING]: filtered.typeSightseeing.reduce((acc, item) => acc + item.price, 0),
+    [Types.TAXI]: filtered.typeTaxi.reduce((acc, item) => acc + item.price, 0),
+    [Types.TRAIN]: filtered.typeTrain.reduce((acc, item) => acc + item.price, 0),
+    [Types.TRANSPORT]: filtered.typeTransport.reduce((acc, item) => acc + item.price, 0)
   };
 };
 
 export const transportUsing = (waypoints) => {
-  const typeBus = waypoints.filter((waypoint) => waypoint.typeWaypoint === `bus`).length;
-  const typeDrive = waypoints.filter((waypoint) => waypoint.typeWaypoint === `drive`).length;
-  const typeFlight = waypoints.filter((waypoint) => waypoint.typeWaypoint === `flight`).length;
-  const typeShip = waypoints.filter((waypoint) => waypoint.typeWaypoint === `ship`).length;
-  const typeTaxi = waypoints.filter((waypoint) => waypoint.typeWaypoint === `taxi`).length;
-  const typeTrain = waypoints.filter((waypoint) => waypoint.typeWaypoint === `train`).length;
-  const typeTransport = waypoints.filter((waypoint) => waypoint.typeWaypoint === `transport`).length;
+  const filtered = filterWaypoints(waypoints);
 
   return {
-    [Types.BUS]: typeBus,
-    [Types.DRIVE]: typeDrive,
-    [Types.FLIGHT]: typeFlight,
-    [Types.SHIP]: typeShip,
-    [Types.TAXI]: typeTaxi,
-    [Types.TRAIN]: typeTrain,
-    [Types.TRANSPORT]: typeTransport
+    [Types.BUS]: filtered.typeBus.length,
+    [Types.DRIVE]: filtered.typeDrive.length,
+    [Types.FLIGHT]: filtered.typeFlight.length,
+    [Types.SHIP]: filtered.typeShip.length,
+    [Types.TAXI]: filtered.typeTaxi.length,
+    [Types.TRAIN]: filtered.typeTrain.length,
+    [Types.TRANSPORT]: filtered.typeTransport.length
   };
 };
 
 export const durationWaypoints = (waypoints) => {
-  const typeBus = waypoints.filter((waypoint) => waypoint.typeWaypoint === `bus`);
-  const typeCheckIn = waypoints.filter((waypoint) => waypoint.typeWaypoint === `check-in`);
-  const typeDrive = waypoints.filter((waypoint) => waypoint.typeWaypoint === `drive`);
-  const typeFlight = waypoints.filter((waypoint) => waypoint.typeWaypoint === `flight`);
-  const typeRestaurant = waypoints.filter((waypoint) => waypoint.typeWaypoint === `restaurant`);
-  const typeShip = waypoints.filter((waypoint) => waypoint.typeWaypoint === `ship`);
-  const typeSightseeing = waypoints.filter((waypoint) => waypoint.typeWaypoint === `sightseeing`);
-  const typeTaxi = waypoints.filter((waypoint) => waypoint.typeWaypoint === `taxi`);
-  const typeTrain = waypoints.filter((waypoint) => waypoint.typeWaypoint === `train`);
-  const typeTransport = waypoints.filter((waypoint) => waypoint.typeWaypoint === `transport`);
+  const filtered = filterWaypoints(waypoints);
   let durationTimeBus;
   let durationTimeCheckIn;
   let durationTimeDrive;
@@ -82,43 +73,43 @@ export const durationWaypoints = (waypoints) => {
   let durationTimeTrain;
   let durationTimeTransport;
 
-  typeBus.forEach((item) => {
+  filtered.typeBus.forEach((item) => {
     durationTimeBus = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeCheckIn.forEach((item) => {
+  filtered.typeCheckIn.forEach((item) => {
     durationTimeCheckIn = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeDrive.forEach((item) => {
+  filtered.typeDrive.forEach((item) => {
     durationTimeDrive = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeFlight.forEach((item) => {
+  filtered.typeFlight.forEach((item) => {
     durationTimeFlight = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeRestaurant.forEach((item) => {
+  filtered.typeRestaurant.forEach((item) => {
     durationTimeRestaurant = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeShip.forEach((item) => {
+  filtered.typeShip.forEach((item) => {
     durationTimeShip = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeSightseeing.forEach((item) => {
+  filtered.typeSightseeing.forEach((item) => {
     durationTimeSightSeeing = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeTaxi.forEach((item) => {
+  filtered.typeTaxi.forEach((item) => {
     durationTimeTaxi = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeTrain.forEach((item) => {
+  filtered.typeTrain.forEach((item) => {
     durationTimeTrain = getDurationMs(item.endDate, item.startDate);
   });
 
-  typeTransport.forEach((item) => {
+  filtered.typeTransport.forEach((item) => {
     durationTimeTransport = getDurationMs(item.endDate, item.startDate);
   });
 
