@@ -1,4 +1,17 @@
-export const TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+export const Types = {
+  TAXI: `taxi`,
+  BUS: `bus`,
+  TRAIN: `train`,
+  SHIP: `ship`,
+  TRANSPORT: `transport`,
+  DRIVE: `drive`,
+  FLIGHT: `flight`,
+  CHECK_IN: `check-in`,
+  SIGHTSEEING: `sightseeing`,
+  RESTAURANT: `restaurant`
+};
+
+export const TYPES = Object.values(Types);
 
 export const DESTINATION_CITIES = [`Amsterdam`, `Chamonix`, `Geneva`, `Saint Petersburg`];
 export const OFFERS = [
@@ -70,4 +83,9 @@ export const MenuItem = {
   NEW_EVENT: `New event`,
   TABLE: `Table`,
   STATS: `Stats`
+};
+
+export const WaypointEditMode = {
+  ADD_NEW: `ADD NEW`,
+  EDIT: `EDIT`
 };

@@ -1,7 +1,7 @@
 import TripEditView from "../view/trip-edit.js";
 import TripView from "../view/trip.js";
 import {remove, renderElement, replace} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
+import {UserAction, UpdateType, WaypointEditMode} from "../const.js";
 import {isDateEqual} from "../utils//trip.js";
 
 const Mode = {
@@ -34,7 +34,7 @@ export default class Waypoint {
     const prevTripEditComponent = this._tripEditComponent;
 
     this._tripComponent = new TripView(trip);
-    this._tripEditComponent = new TripEditView(trip, false);
+    this._tripEditComponent = new TripEditView(trip, WaypointEditMode.EDIT);
 
     this._tripComponent.setEditClickHandler(this._editClickHandler);
     this._tripEditComponent.setFormSubmitHandler(this._formSubmitHandler);

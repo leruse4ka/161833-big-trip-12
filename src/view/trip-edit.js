@@ -1,10 +1,7 @@
-import {
-  getRandomInteger,
-  capitalize
-} from "../utils/common.js";
+import {capitalize} from "../utils/common.js";
 import {
   TYPES,
-  OFFERS,
+  OFFERS, WaypointEditMode
 } from "../const.js";
 import SmartView from "./smart.js";
 import {currentAction} from "../utils/trip.js";
@@ -17,20 +14,20 @@ const OFFERS_AMOUNT = 3;
 const WAYPOINT_BLANK = {
   typeWaypoint: TYPES[0],
   destination: {
-    description: `Chamonix, is a beautiful city, a true asian pearl, with crowded streets.`,
-    name: `Chamonix`,
+    description: ``,
+    name: ``,
     pictures: [
       {
         src: `http://picsum.photos/248/152?r=${Math.random()}`,
-        description: `Chamonix parliament building`
+        description: ``
       }
     ]
   },
   offers: OFFERS.slice(0, OFFERS_AMOUNT),
   startDate: Date.now(),
-  endDate: Date.now() + 10000000,
-  price: getRandomInteger(10, 300),
-  isFavorite: true
+  endDate: Date.now(),
+  price: 100,
+  isFavorite: true,
 };
 
 const createEventDetalis = (offers, destination) => {
@@ -66,7 +63,7 @@ const createEventDetalis = (offers, destination) => {
 </section>`;
 };
 
-const createTripEdit = (data) => {
+const createTripEdit = (data, mode) => {
   const {
     offers,
     destination,
@@ -92,7 +89,7 @@ const createTripEdit = (data) => {
     minute: `numeric`
   });
 
-  return `<li class="trip-events__item">
+  return `${mode === WaypointEditMode.EDIT ? `<li class="trip-events__item">` : `<div>`}
   <form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -193,11 +190,11 @@ const createTripEdit = (data) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price ? price : ``}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${mode === WaypointEditMode.EDIT ? price : ``}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__reset-btn" type="reset">${mode === WaypointEditMode.EDIT ? `Delete` : `Cancel`}</button>
 
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
                       <label class="event__favorite-btn" for="event-favorite-1">
@@ -207,22 +204,25 @@ const createTripEdit = (data) => {
                         </svg>
                       </label>
 
-      <button class="event__rollup-btn" type="button">
+      ${mode === WaypointEditMode.EDIT ? `<button class="event__rollup-btn" type="button">
                         <span class="visually-hidden">Open event</span>
-                      </button>
+                      </button>` : ``}
     </header>
     ${destination ? createEventDetalis(offers, destination) : ``}
 
   </form>
-  </li>`;
+  ${mode === WaypointEditMode.EDIT ? `</li>` : `</div>`}`;
 };
 
 export default class TripEdit extends SmartView {
-  constructor(waypoint = WAYPOINT_BLANK, isNew) {
+  constructor(waypoint, mode) {
     super();
+    if (waypoint === null) {
+      waypoint = WAYPOINT_BLANK;
+    }
     this._data = TripEdit.parseTripToData(waypoint);
     this._datepicker = null;
-    this._isNew = isNew;
+    this._mode = mode;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -232,6 +232,7 @@ export default class TripEdit extends SmartView {
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._priceHandler = this._priceHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -253,7 +254,7 @@ export default class TripEdit extends SmartView {
   }
 
   getTemplate() {
-    return createTripEdit(this._data, this._isNew);
+    return createTripEdit(this._data, this._mode);
   }
 
   restoreHandlers() {
@@ -261,8 +262,11 @@ export default class TripEdit extends SmartView {
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
-    this.setCloseClickHandler(this._callback.closeClick);
     this.setDeleteClickHandler(this._callback.deleteClick);
+
+    if (this._mode === WaypointEditMode.EDIT) {
+      this.setCloseClickHandler(this._callback.closeClick);
+    }
   }
 
   _setDatepicker() {
@@ -292,11 +296,14 @@ export default class TripEdit extends SmartView {
 
   _setInnerHandlers() {
     this.getElement()
-      .querySelector(`#event-price-1`)
+      .querySelector(`.event__input--price`)
       .addEventListener(`change`, this._priceHandler);
     this.getElement()
       .querySelector(`.event__type-list`)
       .addEventListener(`change`, this._typeHandler);
+    this.getElement()
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`input`, this._cityChangeHandler);
   }
 
   _formSubmitHandler(evt) {
@@ -331,6 +338,12 @@ export default class TripEdit extends SmartView {
   _dateEndChangeHandler([userDate]) {
     this.updateData({
       endDate: userDate
+    });
+  }
+
+  _cityChangeHandler(evt) {
+    this.updateData({
+      name: evt.target.value
     });
   }
 

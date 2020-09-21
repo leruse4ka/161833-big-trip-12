@@ -36,22 +36,31 @@ export default class WaypointBoard {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+  }
+
+  init() {
+    this._renderWaypoint();
 
     this._waypointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+  }
 
+  destroy() {
+    this._clearBoard({resetSortType: true});
+
+    remove(this._tripDaysListComponent);
+
+    this._waypointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createWaypoint() {
     if (this._waypointsModel.getWaypoints().length < 1) {
       this._waypointNewPresenter = new WaypointNewPresenter(this._tripContainer, this._handleViewAction, `afterbegin`);
     } else {
       this._waypointNewPresenter = new WaypointNewPresenter(this._tripDaysListComponent, this._handleViewAction, `beforebegin`);
     }
-  }
 
-  init() {
-    this._renderWaypoint();
-  }
-
-  createWaypoint() {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
     this._waypointNewPresenter.init();
@@ -72,7 +81,9 @@ export default class WaypointBoard {
   }
 
   _handleModeChange() {
-    this._waypointNewPresenter.destroy();
+    if (this._waypointNewPresenter) {
+      this._waypointNewPresenter.destroy();
+    }
     Object
       .values(this._waypointPresenter)
       .forEach((presenter) => presenter.resetView());
@@ -176,7 +187,10 @@ export default class WaypointBoard {
   }
 
   _clearBoard({resetSortType = false} = {}) {
-    this._waypointNewPresenter.destroy();
+    if (this._waypointNewPresenter) {
+      this._waypointNewPresenter.destroy();
+    }
+
     Object
       .values(this._waypointPresenter)
       .forEach((presenter) => presenter.destroy());
