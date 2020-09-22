@@ -18,6 +18,13 @@ export const getDuration = (end, start) => {
   };
 };
 
+export const getDurationMs = (end, start) => {
+  const startDate = moment(start);
+  const endDate = moment(end);
+  const duration = moment.duration(endDate.diff(startDate));
+  return Math.floor(duration.asHours());
+};
+
 export const capitalize = (el) => {
   el = el[0].toUpperCase() + el.substring(1);
   return el;

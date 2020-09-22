@@ -1,6 +1,5 @@
 import FilterView from "../view/header-filter.js";
 import {renderElement, replace, remove} from "../utils/render.js";
-import {filter} from "../utils/filter.js";
 import {FilterType, UpdateType} from "../const.js";
 
 export default class Filter {
@@ -62,6 +61,6 @@ export default class Filter {
         type: FilterType.PAST,
         name: `PAST`
       }
-    ]
+    ];
   }
 }

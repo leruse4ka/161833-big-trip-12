@@ -1,20 +1,20 @@
 import TripEditView from "../view/trip-edit.js";
 import {generateId} from "../mock/mock.js";
 import {remove, renderElement} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
+import {UserAction, UpdateType, WaypointEditMode} from "../const.js";
 
 export default class WaypointNew {
   constructor(waypointListContainer, changeData, renderPosition) {
     this._waypointListContainer = waypointListContainer;
     this._changeData = changeData;
     this._renderPosition = renderPosition;
+    this._waypoint = null;
 
     this._tripEditComponent = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
@@ -23,11 +23,10 @@ export default class WaypointNew {
       return;
     }
 
-    this._tripEditComponent = new TripEditView();
+    this._tripEditComponent = new TripEditView(this._waypoint, WaypointEditMode.ADD_NEW);
     this._tripEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._tripEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._tripEditComponent.setCloseClickHandler(this._closeClickHandler);
 
     renderElement(this._waypointListContainer, this._tripEditComponent, this._renderPosition);
 
@@ -43,7 +42,6 @@ export default class WaypointNew {
     this._tripEditComponent = null;
 
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    document.removeEventListener(`click`, this._closeClickHandler);
   }
 
   _handleFormSubmit(waypoint) {

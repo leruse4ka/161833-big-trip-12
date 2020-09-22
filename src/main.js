@@ -4,10 +4,11 @@ import FilterPresenter from "./presenter/filter.js";
 import BoardPresenter from "./presenter/board.js";
 import TripInfoView from "./view/trip-info.js";
 import {waypoints} from "./mock/mock.js";
-import {renderElement} from "./utils/render.js";
+import {remove, renderElement} from "./utils/render.js";
 import WaypointsModel from "./model/waypoint.js";
 import FilterModel from "./model/filter.js";
 import {MenuItem} from "./const.js";
+import StatsView from "./view/stats.js";
 
 const filterModel = new FilterModel();
 
@@ -16,6 +17,7 @@ const headerMain = siteHeaderElement.querySelector(`.trip-main`);
 const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
 const siteMainElement = document.querySelector(`.page-main`);
 const tripEvents = siteMainElement.querySelector(`.trip-events`);
+const bodyContainer = siteMainElement.querySelector(`.page-body__container`);
 const headerMenuComponent = new HeaderMenuView();
 
 renderElement(headerMain, new HeaderInfoView(), `afterbegin`);
@@ -29,13 +31,20 @@ const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
 
 document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
 
+let statsComponent = null;
+
 const handleHeaderMenuClick = (menuItem) => {
   switch (menuItem) {
-    case MenuItem.STATS:
-
-      break;
     case MenuItem.TABLE:
-
+      tripPresenter.destroy();
+      tripPresenter.init();
+      remove(statsComponent);
+      break;
+    case MenuItem.STATS:
+      remove(statsComponent);
+      tripPresenter.destroy();
+      statsComponent = new StatsView(waypointsModel.getWaypoints());
+      renderElement(bodyContainer, statsComponent, `beforeend`);
       break;
   }
 };
@@ -50,6 +59,7 @@ const filterPresenter = new FilterPresenter(headerControls, filterModel, waypoin
 
 filterPresenter.init();
 tripPresenter.init();
+
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
   evt.preventDefault();
