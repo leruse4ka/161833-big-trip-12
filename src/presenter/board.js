@@ -19,18 +19,24 @@ import {
 import WaypointPresenter from "./waypoint.js";
 import {filter} from "../utils/filter.js";
 import WaypointNewPresenter from "./waypoint-new.js";
+import LoadingView from "../view/loading.js";
 
 export default class WaypointBoard {
-  constructor(tripContainer, waypointsModel, filterModel) {
+  constructor(tripContainer, waypointsModel, filterModel, api) {
     this._tripContainer = tripContainer;
     this._waypointsModel = waypointsModel;
     this._filterModel = filterModel;
+    this._isLoading = true;
+    this._api = api;
+    this._destination = this._waypointsModel.getDestinations();
+    this._offers = this._waypointsModel.getOffers();
 
     this._tripDaysListComponent = new TripDaysListView();
     this._sortComponent = null;
     this._noTripComponent = new NoTripView();
     this._currentSortType = SortType.DEFAULT;
     this._waypointPresenter = {};
+    this._loadingComponent = new LoadingView();
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -56,9 +62,9 @@ export default class WaypointBoard {
 
   createWaypoint() {
     if (this._waypointsModel.getWaypoints().length < 1) {
-      this._waypointNewPresenter = new WaypointNewPresenter(this._tripContainer, this._handleViewAction, `afterbegin`);
+      this._waypointNewPresenter = new WaypointNewPresenter(this._tripContainer, this._handleViewAction, `afterbegin`, this._destination, this._offers);
     } else {
-      this._waypointNewPresenter = new WaypointNewPresenter(this._tripDaysListComponent, this._handleViewAction, `beforebegin`);
+      this._waypointNewPresenter = new WaypointNewPresenter(this._tripDaysListComponent, this._handleViewAction, `beforebegin`, this._destination, this._offers);
     }
 
     this._currentSortType = SortType.DEFAULT;
@@ -92,13 +98,19 @@ export default class WaypointBoard {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_TRIP:
-        this._waypointsModel.updateWaypoint(updateType, update);
+        this._api.updateWaypoint(update).then((response) => {
+          this._waypointsModel.updateWaypoint(updateType, response);
+        });
         break;
       case UserAction.ADD_TRIP:
-        this._waypointsModel.addWaypoint(updateType, update);
+        this._api.addWaypoint(update).then((response) => {
+          this._waypointsModel.addWaypoint(updateType, response);
+        });
         break;
       case UserAction.DELETE_TRIP:
-        this._waypointsModel.deleteWaypoint(updateType, update);
+        this._api.deleteWaypoint(update).then(() => {
+          this._waypointsModel.deleteWaypoint(updateType, update);
+        });
         break;
     }
   }
@@ -114,6 +126,11 @@ export default class WaypointBoard {
         break;
       case UpdateType.MAJOR:
         this._clearBoard({resetSortType: true});
+        this._renderWaypoint();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderWaypoint();
         break;
     }
@@ -141,7 +158,7 @@ export default class WaypointBoard {
   }
 
   _renderTrip(tripListElement, trip) {
-    const waypointPresenter = new WaypointPresenter(tripListElement, this._handleViewAction, this._handleModeChange);
+    const waypointPresenter = new WaypointPresenter(tripListElement, this._handleViewAction, this._handleModeChange, this._waypointsModel.getDestinations(), this._waypointsModel.getOffers());
     waypointPresenter.init(trip);
     this._waypointPresenter[trip.id] = waypointPresenter;
   }
@@ -154,6 +171,10 @@ export default class WaypointBoard {
       .forEach((trip) => {
         this._renderTrip(day.querySelector(`.trip-events__list`), trip);
       });
+  }
+
+  _renderLoading() {
+    renderElement(this._tripContainer, this._loadingComponent, `afterbegin`);
   }
 
   _renderNoTrip() {
@@ -198,6 +219,7 @@ export default class WaypointBoard {
     remove(this._tripDaysListComponent);
     remove(this._sortComponent);
     remove(this._noTripComponent);
+    remove(this._loadingComponent);
 
     this._waypointPresenter = {};
 
@@ -207,11 +229,18 @@ export default class WaypointBoard {
   }
 
   _renderWaypoint() {
-    if (!this._getWaypoints().length) {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
+    const waypoints = this._getWaypoints();
+
+    if (!waypoints.length) {
       this._renderNoTrip();
     } else {
       this._renderSort();
-      this._renderTripDaysList(this._getWaypoints());
+      this._renderTripDaysList(waypoints);
     }
   }
 }

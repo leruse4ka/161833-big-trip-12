@@ -10,10 +10,12 @@ const Mode = {
 };
 
 export default class Waypoint {
-  constructor(tripListComponent, changeData, changeMode) {
+  constructor(tripListComponent, changeData, changeMode, destinations, offers) {
     this._tripListComponent = tripListComponent;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._tripComponent = null;
     this._tripEditComponent = null;
@@ -34,8 +36,7 @@ export default class Waypoint {
     const prevTripEditComponent = this._tripEditComponent;
 
     this._tripComponent = new TripView(trip);
-    this._tripEditComponent = new TripEditView(trip, WaypointEditMode.EDIT);
-
+    this._tripEditComponent = new TripEditView(trip, WaypointEditMode.EDIT, this._destinations, this._offers);
     this._tripComponent.setEditClickHandler(this._editClickHandler);
     this._tripEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -129,4 +130,5 @@ export default class Waypoint {
     replace(this._tripComponent, this._tripEditComponent);
     this._mode = Mode.DEFAULT;
   }
+
 }

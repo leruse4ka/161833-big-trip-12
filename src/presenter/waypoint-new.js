@@ -1,14 +1,15 @@
 import TripEditView from "../view/trip-edit.js";
-import {generateId} from "../mock/mock.js";
 import {remove, renderElement} from "../utils/render.js";
 import {UserAction, UpdateType, WaypointEditMode} from "../const.js";
 
 export default class WaypointNew {
-  constructor(waypointListContainer, changeData, renderPosition) {
+  constructor(waypointListContainer, changeData, renderPosition, destination, offers) {
     this._waypointListContainer = waypointListContainer;
     this._changeData = changeData;
     this._renderPosition = renderPosition;
     this._waypoint = null;
+    this._offers = offers;
+    this._destination = destination;
 
     this._tripEditComponent = null;
 
@@ -23,7 +24,7 @@ export default class WaypointNew {
       return;
     }
 
-    this._tripEditComponent = new TripEditView(this._waypoint, WaypointEditMode.ADD_NEW);
+    this._tripEditComponent = new TripEditView(this._waypoint, WaypointEditMode.ADD_NEW, this._destination, this._offers);
     this._tripEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._tripEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -48,7 +49,7 @@ export default class WaypointNew {
     this._changeData(
         UserAction.ADD_TRIP,
         UpdateType.MINOR,
-        Object.assign({id: generateId()}, waypoint)
+        waypoint
     );
 
     this.destroy();

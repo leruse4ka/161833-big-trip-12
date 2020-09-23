@@ -30,42 +30,52 @@ const WAYPOINT_BLANK = {
   isFavorite: true,
 };
 
-const createEventDetalis = (offers, destination) => {
+const createEventDetalis = (data, offersAll) => {
+  const {typeWaypoint, offers, destination} = data;
+  const offersType = offersAll.filter((item) => item.typeWaypoint === typeWaypoint);
+  const newOffers = offersType.reduce((acc, item) => {
+    acc = item;
+    return acc;
+  }, {});
+
   return `<section class="event__details">
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
 
-      ${(offers) ? Object.entries(offers).map((item) =>
-    `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${item[1].type}-1" type="checkbox" name="event-offer-luggage" checked>
-        <label class="event__offer-label" for="event-offer-${item[1].type}-1">
-          <span class="event__offer-title">${item[1].name}</span>
+      ${(newOffers.offers) ? newOffers.offers.map((item) => {
+    const offerData = offers.filter((offer) => offer.title === item.title);
+    return `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${item.title}-1" type="checkbox" name="event-offer-${item.title}" ${offerData.length ? `checked` : ``}>
+        <label class="event__offer-label" for="event-offer-${item.title}-1">
+          <span class="event__offer-title">${item.title}</span>
           &plus;
-          &euro;&nbsp;<span class="event__offer-price">${item[1].price}</span>
+          &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
         </label>
-      </div>`
-  ).join(``) : `` }
+      </div>`;
+  }).join(``) : `` }
     </div>
   </section>
 
   <section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
+    <p class="event__destination-description">${destination.description ? destination.description : ``}</p>
 
     <div class="event__photos-container">
       <div class="event__photos-tape">
-        <img class="event__photo" src="${destination.pictures[0].src}" alt="${destination.pictures[0].description}">
+      ${destination.pictures ? destination.pictures.map((item) =>
+    `<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`
+  ).join(``) : ``}
+
       </div>
     </div>
   </section>
 </section>`;
 };
 
-const createTripEdit = (data, mode) => {
+const createTripEdit = (data, mode, destinations, offers) => {
   const {
-    offers,
     destination,
     price,
     startDate,
@@ -73,6 +83,9 @@ const createTripEdit = (data, mode) => {
     typeWaypoint,
     isFavorite
   } = data;
+
+  const uniqCity = destinations ? new Set(destinations.map((item) => item.name)) : null;
+
 
   const currentDateStart = new Date(startDate).toLocaleString(`en-GB`, {
     day: `numeric`,
@@ -166,10 +179,7 @@ const createTripEdit = (data, mode) => {
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? destination.name : ``}" list="destination-list-1">
         <datalist id="destination-list-1">
-          <option value="Amsterdam"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
-          <option value="Saint Petersburg"></option>
+        ${uniqCity ? Array.from(uniqCity).map((city) => `<option value="${city}"></option>`).join(``) : ``}
         </datalist>
       </div>
 
@@ -208,14 +218,14 @@ const createTripEdit = (data, mode) => {
                         <span class="visually-hidden">Open event</span>
                       </button>` : ``}
     </header>
-    ${destination ? createEventDetalis(offers, destination) : ``}
+    ${destination ? createEventDetalis(data, offers) : ``}
 
   </form>
   ${mode === WaypointEditMode.EDIT ? `</li>` : `</div>`}`;
 };
 
 export default class TripEdit extends SmartView {
-  constructor(waypoint, mode) {
+  constructor(waypoint, mode, destinations, offers) {
     super();
     if (waypoint === null) {
       waypoint = WAYPOINT_BLANK;
@@ -223,6 +233,8 @@ export default class TripEdit extends SmartView {
     this._data = TripEdit.parseTripToData(waypoint);
     this._datepicker = null;
     this._mode = mode;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -233,6 +245,7 @@ export default class TripEdit extends SmartView {
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._priceHandler = this._priceHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -254,7 +267,7 @@ export default class TripEdit extends SmartView {
   }
 
   getTemplate() {
-    return createTripEdit(this._data, this._mode);
+    return createTripEdit(this._data, this._mode, this._destinations, this._offers);
   }
 
   restoreHandlers() {
@@ -295,6 +308,12 @@ export default class TripEdit extends SmartView {
   }
 
   _setInnerHandlers() {
+    if (this._offers.length > 0) {
+      const offers = this.getElement().querySelectorAll(`.event__offer-checkbox`);
+      offers.forEach((offer) => {
+        offer.addEventListener(`change`, this._offerChangeHandler);
+      });
+    }
     this.getElement()
       .querySelector(`.event__input--price`)
       .addEventListener(`change`, this._priceHandler);
@@ -303,7 +322,7 @@ export default class TripEdit extends SmartView {
       .addEventListener(`change`, this._typeHandler);
     this.getElement()
       .querySelector(`.event__input--destination`)
-      .addEventListener(`input`, this._cityChangeHandler);
+      .addEventListener(`change`, this._cityChangeHandler);
   }
 
   _formSubmitHandler(evt) {
@@ -318,15 +337,52 @@ export default class TripEdit extends SmartView {
 
   _typeHandler(evt) {
     evt.preventDefault();
+    const updateOffers = this._offers.filter((item) => item.typeWaypoint === evt.target.value);
+    const newOffers = updateOffers.reduce((acc, item) => {
+      acc = item;
+      return acc;
+    });
     this.updateData({
-      typeWaypoint: evt.target.value
+      typeWaypoint: evt.target.value,
+      offers: newOffers.offers,
     }, false);
   }
 
   _priceHandler(evt) {
+    evt.preventDefault();
     this.updateData({
-      price: evt.target.value
+      price: Number(evt.target.value)
     }, false);
+  }
+
+  _offerChangeHandler(evt) {
+    evt.preventDefault();
+    const offersType = this._offers.filter((item) => item.typeWaypoint === this._data.typeWaypoint);
+    const offers = offersType.map((item) => item.offers);
+    const newOffers = offers.reduce((acc, item) => {
+      acc = item;
+      return acc;
+    });
+    const updateOffers = newOffers.filter((item) => item.title === evt.target.id.slice(12, -2));
+
+    if (evt.target.checked === true) {
+      evt.target.setAttribute(`checked`, true);
+      const updateOffer = Object.assign(
+          this._data.offers,
+          updateOffers
+      );
+
+      this.updateData({
+        offers: updateOffer
+      }, true);
+    } else {
+      evt.target.setAttribute(`checked`, false);
+      const updateOffer = this._data.offers.filter((item) => item.title !== evt.target.id.slice(12, -2));
+
+      this.updateData({
+        offers: updateOffer
+      }, true);
+    }
   }
 
   _dateStartChangeHandler([userDate]) {
@@ -342,9 +398,14 @@ export default class TripEdit extends SmartView {
   }
 
   _cityChangeHandler(evt) {
+    const updateDestination = this._destinations.filter((item) => item.name === evt.target.value);
+    const newDestination = updateDestination.reduce((acc, item) => {
+      acc = item;
+      return acc;
+    }, {});
     this.updateData({
-      name: evt.target.value
-    });
+      destination: newDestination
+    }, false);
   }
 
   _closeClickHandler(evt) {
@@ -383,7 +444,6 @@ export default class TripEdit extends SmartView {
 
   static parseDataToTrip(data) {
     data = Object.assign({}, data);
-
     return data;
   }
 }

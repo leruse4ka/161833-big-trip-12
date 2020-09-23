@@ -2,10 +2,9 @@ import AbstractView from "./abstract";
 import {getDuration, capitalize} from "../utils/common.js";
 import {currentAction} from "../utils/trip.js";
 
-const createTripTemplate = (waypoint) => {
+const createTripTemplate = (waypoint, offers) => {
   const {
     destination,
-    offers,
     price,
     startDate,
     endDate,
@@ -37,10 +36,10 @@ const createTripTemplate = (waypoint) => {
 
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${(offers) ? Object.entries(offers).map((item) => `<li class="event__offer">
-        <span class="event__offer-title">${item[1].name}</span>
+        ${offers ? offers.slice(0, 3).map((item) => `<li class="event__offer">
+        <span class="event__offer-title">${item.title}</span>
         &plus;
-        &euro;&nbsp;<span class="event__offer-price">${item[1].price}</span>
+        &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
         </li>`).join(``) : ``}
       </ul>
 
@@ -60,7 +59,7 @@ export default class Trip extends AbstractView {
   }
 
   getTemplate() {
-    return createTripTemplate(this._waypoint);
+    return createTripTemplate(this._waypoint, this._waypoint.offers);
   }
 
   _editClickHandler(evt) {

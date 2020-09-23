@@ -16,34 +16,34 @@ export const TYPES = Object.values(Types);
 export const DESTINATION_CITIES = [`Amsterdam`, `Chamonix`, `Geneva`, `Saint Petersburg`];
 export const OFFERS = [
   {
-    name: `Add luggage`,
+    title: `Add luggage`,
     type: `luggage`,
     price: 30,
-    checked: true
+    isChecked: true
   },
   {
-    name: `Switch to comfort class`,
+    title: `Switch to comfort class`,
     type: `comfort`,
     price: 100,
-    checked: true
+    isChecked: true
   },
   {
-    name: `Add meal`,
+    title: `Add meal`,
     type: `meal`,
     price: 15,
-    checked: false
+    isChecked: false
   },
   {
-    name: `Choose seats`,
+    title: `Choose seats`,
     type: `seats`,
     price: 5,
-    checked: false
+    isChecked: false
   },
   {
-    name: `Travel by train`,
+    title: `Travel by train`,
     type: `train`,
     price: 40,
-    checked: false
+    isChecked: false
   },
 ];
 
@@ -70,7 +70,8 @@ export const UserAction = {
 export const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 export const FilterType = {
