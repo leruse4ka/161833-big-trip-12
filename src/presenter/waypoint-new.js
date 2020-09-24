@@ -3,13 +3,11 @@ import {remove, renderElement} from "../utils/render.js";
 import {UserAction, UpdateType, WaypointEditMode} from "../const.js";
 
 export default class WaypointNew {
-  constructor(waypointListContainer, changeData, renderPosition, destination, offers) {
+  constructor(waypointListContainer, changeData, renderPosition) {
     this._waypointListContainer = waypointListContainer;
     this._changeData = changeData;
     this._renderPosition = renderPosition;
     this._waypoint = null;
-    this._offers = offers;
-    this._destination = destination;
 
     this._tripEditComponent = null;
 
@@ -24,7 +22,7 @@ export default class WaypointNew {
       return;
     }
 
-    this._tripEditComponent = new TripEditView(this._waypoint, WaypointEditMode.ADD_NEW, this._destination, this._offers);
+    this._tripEditComponent = new TripEditView(this._waypoint, WaypointEditMode.ADD_NEW);
     this._tripEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._tripEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -45,14 +43,31 @@ export default class WaypointNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._tripEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._tripEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._tripEditComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(waypoint) {
     this._changeData(
         UserAction.ADD_TRIP,
         UpdateType.MINOR,
         waypoint
     );
-
-    this.destroy();
   }
 
   _handleDeleteClick() {

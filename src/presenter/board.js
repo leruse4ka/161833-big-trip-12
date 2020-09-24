@@ -16,7 +16,7 @@ import {
   sortTripTime,
   sortTripPrice
 } from "../utils/trip.js";
-import WaypointPresenter from "./waypoint.js";
+import WaypointPresenter, {State as WaypointPresenterViewState} from "./waypoint.js";
 import {filter} from "../utils/filter.js";
 import WaypointNewPresenter from "./waypoint-new.js";
 import LoadingView from "../view/loading.js";
@@ -98,18 +98,30 @@ export default class WaypointBoard {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_TRIP:
+        this._waypointPresenter[update.id].setViewState(WaypointPresenterViewState.SAVING);
         this._api.updateWaypoint(update).then((response) => {
           this._waypointsModel.updateWaypoint(updateType, response);
+        })
+        .catch(() => {
+          this._waypointPresenter[update.id].setViewState(WaypointPresenterViewState.ABORTING);
         });
         break;
       case UserAction.ADD_TRIP:
+        this._waypointNewPresenter.setSaving();
         this._api.addWaypoint(update).then((response) => {
           this._waypointsModel.addWaypoint(updateType, response);
+        })
+        .catch(() => {
+          this._waypointNewPresenter.setAborting();
         });
         break;
       case UserAction.DELETE_TRIP:
+        this._waypointPresenter[update.id].setViewState(WaypointPresenterViewState.DELETING);
         this._api.deleteWaypoint(update).then(() => {
           this._waypointsModel.deleteWaypoint(updateType, update);
+        })
+        .catch(() => {
+          this._waypointPresenter[update.id].setViewState(WaypointPresenterViewState.ABORTING);
         });
         break;
     }

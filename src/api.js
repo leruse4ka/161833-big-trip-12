@@ -1,3 +1,4 @@
+import StoreModel from "./model/store.js";
 import WaypointsModel from "./model/waypoint.js";
 
 const Method = {
@@ -18,6 +19,14 @@ export default class Api {
     this._authorization = authorization;
   }
 
+  getAll() {
+    return Promise.all([
+      this.getOffers(),
+      this.getDestinations(),
+      this.getWaypoints()
+    ]).then((res) => res[2]);
+  }
+
   getWaypoints() {
     return this._load({url: `points`})
     .then(Api.toJSON)
@@ -27,13 +36,13 @@ export default class Api {
   getDestinations() {
     return this._load({url: `destinations`})
       .then(Api.toJSON)
-      .then((destinations) => destinations.map(WaypointsModel.adaptToClient));
+      .then((destinations) => StoreModel.setDestination(destinations));
   }
 
   getOffers() {
     return this._load({url: `offers`})
     .then(Api.toJSON)
-    .then((offers) => offers.map(WaypointsModel.adaptToClient));
+    .then((offers) => StoreModel.setOffers(offers));
   }
 
   updateWaypoint(waypoint) {

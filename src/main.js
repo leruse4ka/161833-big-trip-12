@@ -2,7 +2,6 @@ import HeaderInfoView from "./view/header-info.js";
 import HeaderMenuView from "./view/header-menu.js";
 import FilterPresenter from "./presenter/filter.js";
 import BoardPresenter from "./presenter/board.js";
-import TripInfoView from "./view/trip-info.js";
 import {remove, renderElement} from "./utils/render.js";
 import WaypointsModel from "./model/waypoint.js";
 import FilterModel from "./model/filter.js";
@@ -23,15 +22,7 @@ const tripEvents = siteMainElement.querySelector(`.trip-events`);
 const bodyContainer = siteMainElement.querySelector(`.page-body__container`);
 const headerMenuComponent = new HeaderMenuView();
 
-renderElement(headerMain, new HeaderInfoView(), `afterbegin`);
-
-const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
-
 const api = new Api(END_POINT, AUTHORIZATION);
-
-// const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
-
-// document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
 
 let statsComponent = null;
 
@@ -62,34 +53,18 @@ filterPresenter.init();
 tripPresenter.init();
 
 
-api.getWaypoints()
+api.getAll()
 .then((waypoints) => {
   waypointsModel.setWaypoints(UpdateType.INIT, waypoints);
-  renderElement(tripHeaderInfo, new TripInfoView(waypoints), `afterbegin`);
+  renderElement(headerMain, new HeaderInfoView(waypoints), `afterbegin`);
   renderElement(headerControls, headerMenuComponent, `afterbegin`);
   headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
 })
 .catch(() => {
   waypointsModel.setWaypoints(UpdateType.INIT, []);
-  renderElement(tripHeaderInfo, new TripInfoView([]), `afterbegin`);
+  renderElement(headerMain, new HeaderInfoView([]), `afterbegin`);
   renderElement(headerControls, headerMenuComponent, `afterbegin`);
   headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
-});
-
-api.getDestinations()
-.then((destination) => {
-  waypointsModel.setDestinations(UpdateType.MINOR, destination);
-})
-.catch(() => {
-  waypointsModel.setDestinations([]);
-});
-
-api.getOffers()
-.then((offers) => {
-  waypointsModel.setOffers(UpdateType.MINOR, offers);
-})
-.catch(() => {
-  waypointsModel.setOffers([]);
 });
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
