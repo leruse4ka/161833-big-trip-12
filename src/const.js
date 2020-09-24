@@ -11,50 +11,6 @@ export const Types = {
   RESTAURANT: `restaurant`
 };
 
-export const TYPES = Object.values(Types);
-
-export const DESTINATION_CITIES = [`Amsterdam`, `Chamonix`, `Geneva`, `Saint Petersburg`];
-export const OFFERS = [
-  {
-    title: `Add luggage`,
-    type: `luggage`,
-    price: 30,
-    isChecked: true
-  },
-  {
-    title: `Switch to comfort class`,
-    type: `comfort`,
-    price: 100,
-    isChecked: true
-  },
-  {
-    title: `Add meal`,
-    type: `meal`,
-    price: 15,
-    isChecked: false
-  },
-  {
-    title: `Choose seats`,
-    type: `seats`,
-    price: 5,
-    isChecked: false
-  },
-  {
-    title: `Travel by train`,
-    type: `train`,
-    price: 40,
-    isChecked: false
-  },
-];
-
-export const DESTINATION_DESC = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`
-];
-
 export const SortType = {
   DEFAULT: `event`,
   TIME: `time`,

@@ -2,7 +2,6 @@ import {
   capitalize
 } from "../utils/common.js";
 import {
-  TYPES,
   WaypointEditMode
 } from "../const.js";
 import SmartView from "./smart.js";
@@ -15,7 +14,7 @@ import StoreModel from "../model/store.js";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const WAYPOINT_BLANK = {
-  typeWaypoint: TYPES[0],
+  typeWaypoint: `bus`,
   destination: {},
   offers: [],
   startDate: Date.now(),
