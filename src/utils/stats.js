@@ -1,19 +1,6 @@
 import {Types} from "../const";
 import {getDurationMs} from "./common";
 
-export const typesWithImg = {
-  [Types.BUS]: `🚌 BUS`,
-  [Types.CHECK_IN]: `🏨 CHECK-IN`,
-  [Types.DRIVE]: `🚗 DRIVE`,
-  [Types.FLIGHT]: `✈️ FLIGHT`,
-  [Types.RESTAURANT]: `🍴 RESTAURANT`,
-  [Types.SHIP]: `🚢 SHIP`,
-  [Types.SIGHTSEEING]: `🏛️ SIGHTSEEING`,
-  [Types.TAXI]: `🚕 TAXI`,
-  [Types.TRAIN]: `🚂 TRAIN`,
-  [Types.TRANSPORT]: `🚊 TRANSPORT`
-};
-
 const filterWaypoints = (waypoints) => {
   return {
     typeBus: waypoints.filter((waypoint) => waypoint.typeWaypoint === `bus`),
@@ -27,6 +14,19 @@ const filterWaypoints = (waypoints) => {
     typeTrain: waypoints.filter((waypoint) => waypoint.typeWaypoint === `train`),
     typeTransport: waypoints.filter((waypoint) => waypoint.typeWaypoint === `transport`),
   };
+};
+
+export const typesWithImg = {
+  [Types.BUS]: `🚌 BUS`,
+  [Types.CHECK_IN]: `🏨 CHECK-IN`,
+  [Types.DRIVE]: `🚗 DRIVE`,
+  [Types.FLIGHT]: `✈️ FLIGHT`,
+  [Types.RESTAURANT]: `🍴 RESTAURANT`,
+  [Types.SHIP]: `🚢 SHIP`,
+  [Types.SIGHTSEEING]: `🏛️ SIGHTSEEING`,
+  [Types.TAXI]: `🚕 TAXI`,
+  [Types.TRAIN]: `🚂 TRAIN`,
+  [Types.TRANSPORT]: `🚊 TRANSPORT`
 };
 
 export const sumPriceTypes = (waypoints) => {
