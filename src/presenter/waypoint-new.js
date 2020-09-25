@@ -1,5 +1,4 @@
 import TripEditView from "../view/trip-edit.js";
-import {generateId} from "../mock/mock.js";
 import {remove, renderElement} from "../utils/render.js";
 import {UserAction, UpdateType, WaypointEditMode} from "../const.js";
 
@@ -44,14 +43,31 @@ export default class WaypointNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._tripEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._tripEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._tripEditComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(waypoint) {
     this._changeData(
         UserAction.ADD_TRIP,
         UpdateType.MINOR,
-        Object.assign({id: generateId()}, waypoint)
+        waypoint
     );
-
-    this.destroy();
   }
 
   _handleDeleteClick() {

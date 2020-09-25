@@ -9,6 +9,12 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 export default class Waypoint {
   constructor(tripListComponent, changeData, changeMode) {
     this._tripListComponent = tripListComponent;
@@ -35,7 +41,6 @@ export default class Waypoint {
 
     this._tripComponent = new TripView(trip);
     this._tripEditComponent = new TripEditView(trip, WaypointEditMode.EDIT);
-
     this._tripComponent.setEditClickHandler(this._editClickHandler);
     this._tripEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._tripEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -52,7 +57,8 @@ export default class Waypoint {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._tripEditComponent, prevTripEditComponent);
+      replace(this._tripComponent, prevTripEditComponent);
+      this._mode = Mode.DEFAULT;
     }
   }
 
@@ -67,6 +73,35 @@ export default class Waypoint {
     }
   }
 
+  setViewState(state) {
+    const resetFormState = () => {
+      this._taskEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._tripEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._tripEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._tripComponent.shake(resetFormState);
+        this._tripEditComponent.shake(resetFormState);
+        break;
+    }
+  }
+
   _editClickHandler() {
     this._replaceTripToForm();
     document.addEventListener(`keydown`, this._onEscKeyDown);
@@ -78,7 +113,6 @@ export default class Waypoint {
         UserAction.UPDATE_TRIP,
         isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
         update);
-    this._replaceFormToTrip();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
@@ -129,4 +163,5 @@ export default class Waypoint {
     replace(this._tripComponent, this._tripEditComponent);
     this._mode = Mode.DEFAULT;
   }
+
 }

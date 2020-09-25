@@ -2,13 +2,15 @@ import HeaderInfoView from "./view/header-info.js";
 import HeaderMenuView from "./view/header-menu.js";
 import FilterPresenter from "./presenter/filter.js";
 import BoardPresenter from "./presenter/board.js";
-import TripInfoView from "./view/trip-info.js";
-import {waypoints} from "./mock/mock.js";
 import {remove, renderElement} from "./utils/render.js";
 import WaypointsModel from "./model/waypoint.js";
 import FilterModel from "./model/filter.js";
-import {MenuItem} from "./const.js";
+import {MenuItem, UpdateType} from "./const.js";
 import StatsView from "./view/stats.js";
+import Api from "./api.js";
+
+const AUTHORIZATION = `Basic kTy9gIdsz231yyD`;
+const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const filterModel = new FilterModel();
 
@@ -20,16 +22,7 @@ const tripEvents = siteMainElement.querySelector(`.trip-events`);
 const bodyContainer = siteMainElement.querySelector(`.page-body__container`);
 const headerMenuComponent = new HeaderMenuView();
 
-renderElement(headerMain, new HeaderInfoView(), `afterbegin`);
-renderElement(headerControls, headerMenuComponent, `afterbegin`);
-
-const tripHeaderInfo = headerMain.querySelector(`.trip-main__trip-info`);
-
-renderElement(tripHeaderInfo, new TripInfoView(waypoints), `afterbegin`);
-
-const getFullPrice = waypoints.reduce((acc, item) => acc + item.price, 0);
-
-document.querySelector(`.trip-info__cost-value`).textContent = getFullPrice;
+const api = new Api(END_POINT, AUTHORIZATION);
 
 let statsComponent = null;
 
@@ -49,17 +42,30 @@ const handleHeaderMenuClick = (menuItem) => {
   }
 };
 
-headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
-
 const waypointsModel = new WaypointsModel();
-waypointsModel.setWaypoints(waypoints);
 
-const tripPresenter = new BoardPresenter(tripEvents, waypointsModel, filterModel);
+
+const tripPresenter = new BoardPresenter(tripEvents, waypointsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(headerControls, filterModel, waypointsModel);
+
 
 filterPresenter.init();
 tripPresenter.init();
 
+
+api.getAll()
+.then((waypoints) => {
+  waypointsModel.setWaypoints(UpdateType.INIT, waypoints);
+  renderElement(headerMain, new HeaderInfoView(waypoints), `afterbegin`);
+  renderElement(headerControls, headerMenuComponent, `afterbegin`);
+  headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
+})
+.catch(() => {
+  waypointsModel.setWaypoints(UpdateType.INIT, []);
+  renderElement(headerMain, new HeaderInfoView([]), `afterbegin`);
+  renderElement(headerControls, headerMenuComponent, `afterbegin`);
+  headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
+});
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
   evt.preventDefault();
