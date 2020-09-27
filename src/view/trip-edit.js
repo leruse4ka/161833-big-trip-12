@@ -40,10 +40,10 @@ const createEventDetalis = (data, offersAll) => {
   const {
     offers,
     destination,
-    isDisabled
+    isDisabled,
+    typeWaypoint
   } = data;
 
-  let {typeWaypoint} = data;
   const offersElement = offersAll[typeWaypoint].map((it) => createOffers(it, offers, isDisabled)).join(``);
   return `<section class="event__details">
   ${offers || offersAll ? `<section class="event__section  event__section--offers">
@@ -174,7 +174,7 @@ const createTripEdit = (data, mode, destinations, offers) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${typeWaypoint ? capitalize(typeWaypoint) : ``} ${currentAction(typeWaypoint)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? destination.name : ``}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" required name="event-destination" value="${destination.name ? destination.name : ``}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
         <datalist id="destination-list-1">
         ${uniqCity ? Array.from(uniqCity).map((city) => `<option value="${city}"></option>`).join(``) : ``}
         </datalist>
@@ -197,7 +197,7 @@ const createTripEdit = (data, mode, destinations, offers) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${mode === WaypointEditMode.EDIT ? price : ``}" ${isDisabled ? `disabled` : ``}>
+        <input class="event__input  event__input--price" id="event-price-1" type="number" required name="event-price" value="${mode === WaypointEditMode.EDIT ? price : ``}" ${isDisabled ? `disabled` : ``}>
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
@@ -291,17 +291,21 @@ export default class TripEdit extends SmartView {
 
     this._datepicker = flatpickr(
         this.getElement().querySelector(`#event-start-time-1`), {
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._data.startDate,
-          onChange: this._dateStartChangeHandler
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": this._data.startDate,
+          "enableTime": true,
+          "time_24hr": true,
+          "onChange": this._dateStartChangeHandler
         }
     );
 
     this._datepicker = flatpickr(
         this.getElement().querySelector(`#event-end-time-1`), {
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._data.endDate,
-          onChange: this._dateEndChangeHandler
+          "enableTime": true,
+          "time_24hr": true,
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": this._data.endDate,
+          "onChange": this._dateEndChangeHandler
         }
     );
   }
@@ -362,13 +366,13 @@ export default class TripEdit extends SmartView {
   _dateStartChangeHandler([userDate]) {
     this.updateData({
       startDate: userDate
-    });
+    }, true);
   }
 
   _dateEndChangeHandler([userDate]) {
     this.updateData({
       endDate: userDate
-    });
+    }, true);
   }
 
   _cityChangeHandler(evt) {

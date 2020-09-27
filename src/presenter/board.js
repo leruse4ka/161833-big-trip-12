@@ -21,7 +21,7 @@ import {filter} from "../utils/filter.js";
 import WaypointNewPresenter from "./waypoint-new.js";
 import LoadingView from "../view/loading.js";
 
-export default class WaypointBoard {
+export default class Board {
   constructor(tripContainer, waypointsModel, filterModel, api) {
     this._tripContainer = tripContainer;
     this._waypointsModel = waypointsModel;
@@ -37,6 +37,7 @@ export default class WaypointBoard {
     this._currentSortType = SortType.DEFAULT;
     this._waypointPresenter = {};
     this._loadingComponent = new LoadingView();
+    this._waypointNewPresenter = null;
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);

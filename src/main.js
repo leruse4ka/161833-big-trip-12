@@ -15,11 +15,11 @@ const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector(`.page-header`);
-const headerMain = siteHeaderElement.querySelector(`.trip-main`);
-const headerControls = siteHeaderElement.querySelector(`.trip-controls`);
+const siteHeaderMain = siteHeaderElement.querySelector(`.trip-main`);
+const siteHeaderControls = siteHeaderElement.querySelector(`.trip-controls`);
 const siteMainElement = document.querySelector(`.page-main`);
-const tripEvents = siteMainElement.querySelector(`.trip-events`);
-const bodyContainer = siteMainElement.querySelector(`.page-body__container`);
+const siteTripEvents = siteMainElement.querySelector(`.trip-events`);
+const siteBodyContainer = siteMainElement.querySelector(`.page-body__container`);
 const headerMenuComponent = new HeaderMenuView();
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -37,7 +37,7 @@ const handleHeaderMenuClick = (menuItem) => {
       remove(statsComponent);
       tripPresenter.destroy();
       statsComponent = new StatsView(waypointsModel.getWaypoints());
-      renderElement(bodyContainer, statsComponent, `beforeend`);
+      renderElement(siteBodyContainer, statsComponent, `beforeend`);
       break;
   }
 };
@@ -45,8 +45,8 @@ const handleHeaderMenuClick = (menuItem) => {
 const waypointsModel = new WaypointsModel();
 
 
-const tripPresenter = new BoardPresenter(tripEvents, waypointsModel, filterModel, api);
-const filterPresenter = new FilterPresenter(headerControls, filterModel, waypointsModel);
+const tripPresenter = new BoardPresenter(siteTripEvents, waypointsModel, filterModel, api);
+const filterPresenter = new FilterPresenter(siteHeaderControls, filterModel, waypointsModel);
 
 
 filterPresenter.init();
@@ -56,14 +56,14 @@ tripPresenter.init();
 api.getAll()
 .then((waypoints) => {
   waypointsModel.setWaypoints(UpdateType.INIT, waypoints);
-  renderElement(headerMain, new HeaderInfoView(waypoints), `afterbegin`);
-  renderElement(headerControls, headerMenuComponent, `afterbegin`);
+  renderElement(siteHeaderMain, new HeaderInfoView(waypoints), `afterbegin`);
+  renderElement(siteHeaderControls, headerMenuComponent, `afterbegin`);
   headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
 })
 .catch(() => {
   waypointsModel.setWaypoints(UpdateType.INIT, []);
-  renderElement(headerMain, new HeaderInfoView([]), `afterbegin`);
-  renderElement(headerControls, headerMenuComponent, `afterbegin`);
+  renderElement(siteHeaderMain, new HeaderInfoView([]), `afterbegin`);
+  renderElement(siteHeaderControls, headerMenuComponent, `afterbegin`);
   headerMenuComponent.setMenuClickHandler(handleHeaderMenuClick);
 });
 

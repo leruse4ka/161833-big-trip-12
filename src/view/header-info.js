@@ -1,5 +1,7 @@
 import AbstractView from "./abstract.js";
 
+const MAX_DAYS_COUNT = 3;
+
 const getRoute = (waypoints) => {
   if (!waypoints.length) {
     return ``;
@@ -18,7 +20,7 @@ const getRoute = (waypoints) => {
   ];
 
   return (
-    (namesToStartDate.length > 3) ? `${namesToStartDate[0]} &mdash; ... &mdash; ${namesToEndDate[0]}` : `${namesToStartDate[0]} &mdash; ${namesToStartDate[1]} &mdash; ${namesToEndDate[0]}`
+    (namesToStartDate.length > MAX_DAYS_COUNT) ? `${namesToStartDate[0]} &mdash; ... &mdash; ${namesToEndDate[0]}` : `${namesToStartDate[0]} &mdash; ${namesToStartDate[1]} &mdash; ${namesToEndDate[0]}`
   );
 };
 
