@@ -11,8 +11,14 @@ const createTripTemplate = (waypoint, offers) => {
     typeWaypoint,
   } = waypoint;
   const durationTime = getDuration(endDate, startDate);
-  const currentDateStart = new Date(startDate).toLocaleTimeString().slice(0, -3);
-  const currentDateEnd = new Date(endDate).toLocaleTimeString().slice(0, -3);
+  const currentDateStart = new Date(startDate).toLocaleString(`en-GB`, {
+    hour: `numeric`,
+    minute: `numeric`
+  });
+  const currentDateEnd = new Date(endDate).toLocaleString(`en-GB`, {
+    hour: `numeric`,
+    minute: `numeric`
+  });
 
   return `<li class="trip-events__item">
     <div class="event">
